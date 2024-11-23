@@ -29,10 +29,13 @@ pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
     };
 }
 
-pub fn position_player(p: PlayerState, game: GameSnapshot) -> Vec<PositionedCard> {
-    let mut out: Vec<PositionedCard> = Vec::new();
+pub fn position_player(p: PlayerState, game: GameSnapshot) -> Vec<PositionedUnit> {
+    let mut out: Vec<PositionedUnit> = Vec::new();
     for (i, c) in p.board.iter().enumerate() {
-        out.push(position_card(c.card.clone(), p.row_board, i, None));
+        out.push(PositionedUnit {
+            unit: c.clone(),
+            pcard: position_card(c.card.clone(), p.row_board, i, None),
+        });
     }
     for (i, c) in p.hand.iter().enumerate() {
         let can_play = impulse_check(c.clone(), game.impulse.clone());
@@ -44,25 +47,28 @@ pub fn position_player(p: PlayerState, game: GameSnapshot) -> Vec<PositionedCard
         } else {
             None
         };
-        out.push(position_card(c.card.clone(), p.row_hand, i, action));
+        out.push(PositionedUnit {
+            unit: c.clone(),
+            pcard: position_card(c.card.clone(), p.row_hand, i, action),
+        });
     }
     return out;
 }
 
 pub fn click_action(p: PlayerState, game: GameSnapshot) -> Option<Action> {
     let positioned = position_player(p.clone(), game);
-    let hovered: Vec<&PositionedCard> = positioned.iter().filter(|pcard| pcard.hover).collect();
+    let hovered: Vec<&PositionedUnit> = positioned.iter().filter(|unit| unit.pcard.hover).collect();
     if let Some(clicked) = hovered.first() {
-        return clicked.action.clone();
+        return clicked.pcard.action.clone();
     } else {
         return None;
     }
 }
 
-fn cards_to_map(cards: Vec<PositionedCard>) -> BTreeMap<CardId, PositionedCard> {
+fn units_to_map(cards: Vec<PositionedUnit>) -> BTreeMap<CardId, PositionedUnit> {
     return cards
         .into_iter()
-        .map(|x| (x.card.card_id.clone(), x))
+        .map(|x| (x.unit.card.card_id.clone(), x))
         .collect::<BTreeMap<_, _>>();
 }
 
@@ -71,16 +77,19 @@ fn tween_player(
     previous: PlayerState,
     percent: f32,
     game: GameSnapshot,
-) -> Vec<PositionedCard> {
+) -> Vec<PositionedUnit> {
     let current_cards = position_player(current, game.clone());
-    let previous_cards = cards_to_map(position_player(previous, game.clone()));
+    let previous_cards = units_to_map(position_player(previous, game.clone()));
     return current_cards
         .iter()
-        .map(|current_card| {
-            if let Some(p_card) = previous_cards.get(&current_card.card.card_id) {
-                return tween_card(current_card.clone(), p_card.clone(), percent);
+        .map(|curr_unit| {
+            if let Some(prev_unit) = previous_cards.get(&curr_unit.unit.card.card_id) {
+                return PositionedUnit {
+                    unit: curr_unit.unit.clone(),
+                    pcard: tween_card(curr_unit.pcard.clone(), prev_unit.pcard.clone(), percent),
+                };
             } else {
-                return current_card.clone();
+                return curr_unit.clone();
             }
         })
         .collect();
@@ -94,6 +103,6 @@ pub fn render_player(
 ) {
     let positioned = tween_player(current.clone(), previous, percent, game);
     for pcard in positioned.iter() {
-        render_card(pcard.clone(), current.player_id == PlayerId::P1);
+        render_unit(pcard.clone(), current.player_id == PlayerId::P1);
     }
 }
