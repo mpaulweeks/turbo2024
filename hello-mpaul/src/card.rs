@@ -16,9 +16,10 @@ pub struct PositionedCard {
     h: f32,
     pub hover: bool,
     pub card: Card,
+    pub action: Option<Action>,
 }
 
-pub fn position_card(card: Card, row: u8, col: usize) -> PositionedCard {
+pub fn position_card(card: Card, row: u8, col: usize, action: Option<Action>) -> PositionedCard {
     let res = resolution();
     let screen_width = res[0] as f32;
     let screen_height = res[1] as f32;
@@ -41,18 +42,24 @@ pub fn position_card(card: Card, row: u8, col: usize) -> PositionedCard {
         h: card_height,
         hover,
         card,
+        action,
     };
 }
 
 pub fn render_card(pcard: PositionedCard, visible: bool) {
     if pcard.hover {
         let margin = pcard.w * 0.2;
+        let color: u32 = if visible && pcard.action.is_some() {
+            0x00FF00FF
+        } else {
+            0xFF0000FF
+        };
         rect!(
             x = pcard.x - (pcard.w + margin) / 2.0,
             y = pcard.y - (pcard.h + margin) / 2.0,
             w = pcard.w + margin,
             h = pcard.h + margin,
-            color = 0x8080ffff,
+            color = color,
             border_radius = 10,
         );
     }
@@ -88,5 +95,6 @@ pub fn tween_card(
         h: tween(previous.h, current.h, ease),
         hover: current.hover,
         card: current.card,
+        action: current.action,
     };
 }

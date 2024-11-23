@@ -60,7 +60,7 @@ pub fn create_impulse_state(deck: Vec<ImpulseCard>) -> ImpulseState {
 
 pub fn render_impulse(state: ImpulseState) {
     for (index, impulse) in state.board.iter().enumerate() {
-        let pcard = position_card(impulse.card.clone(), 2, index);
+        let pcard = position_card(impulse.card.clone(), 2, index, None);
         render_card(pcard, true);
     }
 }

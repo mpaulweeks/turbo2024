@@ -32,24 +32,24 @@ pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
 pub fn position_player(p: PlayerState) -> Vec<PositionedCard> {
     let mut out: Vec<PositionedCard> = Vec::new();
     for (i, c) in p.board.iter().enumerate() {
-        out.push(position_card(c.clone(), p.row_board, i));
+        out.push(position_card(c.clone(), p.row_board, i, None));
     }
     for (i, c) in p.hand.iter().enumerate() {
-        out.push(position_card(c.clone(), p.row_hand, i));
+        out.push(position_card(
+            c.clone(),
+            p.row_hand,
+            i,
+            Some(action_play_from_hand(p.player_id.clone(), c.card_id)),
+        ));
     }
     return out;
 }
 
 pub fn click_action(p: PlayerState) -> Option<Action> {
     let positioned = position_player(p.clone());
-    let hovered: Vec<CardId> = positioned
-        .iter()
-        .filter(|pcard| pcard.hover)
-        .map(|pcard| pcard.card.card_id)
-        .collect();
+    let hovered: Vec<&PositionedCard> = positioned.iter().filter(|pcard| pcard.hover).collect();
     if let Some(clicked) = hovered.first() {
-        // todo verify it was in hand
-        return Some(action_play_from_hand(p.player_id, *clicked));
+        return clicked.action.clone();
     } else {
         return None;
     }
