@@ -34,8 +34,9 @@ turbo::go!({
     let mut state = GameState::load();
     let logic_snapshot = simulate_game(state.history.clone());
 
-    let clicked = mouse(0).left.just_pressed();
-    if clicked {
+    if gamepad(0).a.just_pressed() {
+        state.history.actions.pop();
+    } else if mouse(0).left.just_pressed() {
         if let Some(action) = click_action(logic_snapshot.p1) {
             state.history.actions.push(action);
         }
