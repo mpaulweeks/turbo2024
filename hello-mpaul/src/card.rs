@@ -3,7 +3,7 @@ use crate::*;
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct Card {
     pub instance_id: u32,
-    sprite: String,
+    pub sprite: String,
 }
 
 #[derive(Clone)]
@@ -14,17 +14,6 @@ pub struct PositionedCard {
     h: f32,
     pub hover: bool,
     pub card: Card,
-}
-
-pub fn create_deck() -> Vec<Card> {
-    let mut deck = Vec::new();
-    for _ in 0..10 {
-        deck.push(Card {
-            instance_id: deck.len() as u32 + 1,
-            sprite: "VICardForward_Front".to_string(),
-        });
-    }
-    return deck;
 }
 
 pub fn position_card(card: Card, row: u8, column: usize) -> PositionedCard {

@@ -1,5 +1,7 @@
 mod card;
 use card::*;
+mod deck;
+use deck::*;
 mod player;
 use player::*;
 
