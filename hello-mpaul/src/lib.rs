@@ -37,14 +37,14 @@ turbo::go!({
     let mut state = GameState::load();
     let logic_snapshot = simulate_game(state.history.clone()).current;
     // todo delta time?
-    state.history.actionTime =
-        (state.history.actionTime + 1.0).clamp(MIN_ACTION_TIME, MAX_ACTION_TIME);
+    state.history.action_time =
+        (state.history.action_time + 1.0).clamp(MIN_ACTION_TIME, MAX_ACTION_TIME);
 
     if gamepad(0).a.just_pressed() {
         state.history.actions.pop();
     } else if mouse(0).left.just_pressed() {
         if let Some(action) = click_action(logic_snapshot.p1) {
-            state.history.actionTime = MIN_ACTION_TIME;
+            state.history.action_time = MIN_ACTION_TIME;
             state.history.actions.push(action);
         }
     }
@@ -52,7 +52,7 @@ turbo::go!({
     state.save();
 
     // render
-    let action_progress = (state.history.actionTime - MIN_ACTION_TIME) / MAX_ACTION_TIME;
+    let action_progress = (state.history.action_time - MIN_ACTION_TIME) / MAX_ACTION_TIME;
     let delta = simulate_game(state.history.clone());
 
     // todo render tween from prev to curr

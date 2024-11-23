@@ -5,7 +5,7 @@ pub struct GameHistory {
     impulse_deck: Deck,
     p1deck: Deck,
     p2deck: Deck,
-    pub actionTime: f32,
+    pub action_time: f32,
     pub actions: Vec<Action>,
 }
 
@@ -19,7 +19,7 @@ pub fn create_game() -> GameHistory {
         impulse_deck: Vec::new(), // todo
         p1deck: create_deck(),
         p2deck: create_deck(),
-        actionTime: 0.0,
+        action_time: 0.0,
         actions: starting_actions,
     };
 }
