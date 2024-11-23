@@ -25,3 +25,22 @@ pub fn get_atk_sprite(power: i32) -> String {
     ];
     return all.get(power as usize).unwrap().clone();
 }
+
+pub fn get_clock_sprite(impulse_turn: usize) -> String {
+    let all = vec![
+        "ATK_Sprites1".to_string(), // todo missing 0
+        "TimeNumbers1".to_string(),
+        "TimeNumbers2".to_string(),
+        "TimeNumbers3".to_string(),
+        "TimeNumbers4".to_string(),
+        "TimeNumbers5".to_string(),
+        "TimeNumbers6".to_string(),
+        "TimeNumbers7".to_string(),
+        "TimeNumbers8".to_string(),
+        "TimeNumbers9".to_string(),
+        "TimeNumbers10".to_string(),
+        "TimeNumbers11".to_string(),
+        "TimeNumbers12".to_string(),
+    ];
+    return all.get(impulse_turn).unwrap().clone();
+}

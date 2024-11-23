@@ -234,5 +234,5 @@ pub fn render_round(state: GameSim) {
         RoundPhase::Plan => "Plan",
         RoundPhase::Attack => "Attack",
     };
-    text!(message)
+    text!(message, x = 10, y = 10, font = Font::L)
 }

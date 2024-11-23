@@ -56,6 +56,11 @@ const POWER_HEIGHT: f32 = 32.0;
 const POWER_MARGIN_X: f32 = 5.0;
 const POWER_MARGIN_Y: f32 = 2.0;
 
+const CLOCK_WIDTH: f32 = 16.0;
+const CLOCK_HEIGHT: f32 = 16.0;
+const CLOCK_MARGIN_X: f32 = 7.0;
+const CLOCK_MARGIN_Y: f32 = -5.0;
+
 pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
     let is_ready = punit.unit.card.card_id == READY_CARD_ID;
     let visible = visible || is_ready;
@@ -80,12 +85,16 @@ pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
         highlight,
     );
     if visible && !is_ready {
-        let power_sprite = get_atk_sprite(punit.unit.power);
         // draw unit details
         sprite!(
-            &power_sprite,
+            &get_atk_sprite(punit.unit.power),
             x = punit.pos.x + punit.pos.w / 2.0 - (POWER_WIDTH + POWER_MARGIN_X),
             y = punit.pos.y + punit.pos.h / 2.0 - (POWER_HEIGHT + POWER_MARGIN_Y),
+        );
+        sprite!(
+            &get_clock_sprite(punit.unit.impulse_turn),
+            x = punit.pos.x + punit.pos.w / 2.0 - (CLOCK_WIDTH + CLOCK_MARGIN_X),
+            y = punit.pos.y - punit.pos.h / 2.0 - (CLOCK_MARGIN_Y),
         );
     }
 }
