@@ -18,15 +18,15 @@ pub struct PositionedCard {
     pub card: Card,
 }
 
-pub fn position_card(card: Card, row: u8, column: usize) -> PositionedCard {
+pub fn position_card(card: Card, row: u8, col: usize) -> PositionedCard {
     let res = resolution();
     let screen_width = res[0] as f32;
     let screen_height = res[1] as f32;
-    let slot_width = screen_width / 5.0;
-    let slot_height = screen_height / 4.0;
+    let slot_width = screen_width / 8.0;
+    let slot_height = screen_height / 5.0;
     let card_width = 80.0;
     let card_height = 112.0;
-    let x = slot_width * (column as f32 + 0.5);
+    let x = slot_width * (col as f32 + 0.5);
     let y = slot_height * (row as f32 + 0.5);
     let left = (x - card_width / 2.0) as i32;
     let right = (x + card_width / 2.0) as i32;

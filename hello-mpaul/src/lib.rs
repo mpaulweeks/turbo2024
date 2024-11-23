@@ -4,10 +4,12 @@ mod card;
 use card::*;
 mod deck;
 use deck::*;
-mod history;
-use history::*;
 mod game;
 use game::*;
+mod history;
+use history::*;
+mod impulse;
+use impulse::*;
 mod player;
 use player::*;
 

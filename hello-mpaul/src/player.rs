@@ -9,7 +9,7 @@ pub enum PlayerId {
 }
 
 #[derive(Clone)]
-pub struct Player {
+pub struct PlayerState {
     pub player_id: PlayerId,
     row_board: u8,
     row_hand: u8,
@@ -18,10 +18,10 @@ pub struct Player {
     pub deck: Vec<Card>,
 }
 
-pub fn create_player(index: PlayerId, deck: Deck) -> Player {
-    return Player {
-        row_board: if index == PlayerId::P1 { 2 } else { 1 },
-        row_hand: if index == PlayerId::P1 { 3 } else { 0 },
+pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
+    return PlayerState {
+        row_board: if index == PlayerId::P1 { 3 } else { 1 },
+        row_hand: if index == PlayerId::P1 { 4 } else { 0 },
         player_id: index,
         board: Vec::new(),
         hand: Vec::new(),
@@ -29,7 +29,7 @@ pub fn create_player(index: PlayerId, deck: Deck) -> Player {
     };
 }
 
-pub fn position_player(p: Player) -> Vec<PositionedCard> {
+pub fn position_player(p: PlayerState) -> Vec<PositionedCard> {
     let mut out: Vec<PositionedCard> = Vec::new();
     for (i, c) in p.board.iter().enumerate() {
         out.push(position_card(c.clone(), p.row_board, i));
@@ -40,7 +40,7 @@ pub fn position_player(p: Player) -> Vec<PositionedCard> {
     return out;
 }
 
-pub fn click_action(p: Player) -> Option<Action> {
+pub fn click_action(p: PlayerState) -> Option<Action> {
     let positioned = position_player(p.clone());
     let hovered: Vec<CardId> = positioned
         .iter()
@@ -62,7 +62,7 @@ fn cards_to_map(cards: Vec<PositionedCard>) -> BTreeMap<CardId, PositionedCard> 
         .collect::<BTreeMap<_, _>>();
 }
 
-fn tween_player(current: Player, previous: Player, percent: f32) -> Vec<PositionedCard> {
+fn tween_player(current: PlayerState, previous: PlayerState, percent: f32) -> Vec<PositionedCard> {
     let current_cards = position_player(current);
     let previous_cards = cards_to_map(position_player(previous));
     return current_cards
@@ -77,7 +77,7 @@ fn tween_player(current: Player, previous: Player, percent: f32) -> Vec<Position
         .collect();
 }
 
-pub fn render_player(current: Player, previous: Player, percent: f32) {
+pub fn render_player(current: PlayerState, previous: PlayerState, percent: f32) {
     let positioned = tween_player(current.clone(), previous, percent);
     for pcard in positioned.iter() {
         render_card(pcard.clone(), current.player_id == PlayerId::P1);

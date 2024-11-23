@@ -2,6 +2,7 @@ use crate::*;
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 enum ActionType {
+    DrawImpulse,
     DrawFromDeck,
     PlayFromHand,
 }
@@ -11,6 +12,14 @@ pub struct Action {
     action_type: ActionType,
     player_id: PlayerId,
     card_id: u32,
+}
+
+pub fn action_draw_impulse() -> Action {
+    return Action {
+        action_type: ActionType::DrawImpulse,
+        player_id: PlayerId::P1,
+        card_id: 0,
+    };
 }
 
 pub fn action_draw_from_deck(player_id: PlayerId) -> Action {
@@ -31,17 +40,28 @@ pub fn action_play_from_hand(player_id: PlayerId, card_id: CardId) -> Action {
 
 #[derive(Clone)]
 pub struct GameSnapshot {
-    pub p1: Player,
-    pub p2: Player,
+    pub impulse: ImpulseState,
+    pub p1: PlayerState,
+    pub p2: PlayerState,
 }
 
 pub fn apply_action(snapshot: GameSnapshot, action: Action) -> GameSnapshot {
+    let mut impulse = snapshot.impulse.clone();
     let mut player = if action.player_id == PlayerId::P1 {
         snapshot.p1.clone()
     } else {
         snapshot.p2.clone()
     };
     match action.action_type {
+        ActionType::DrawImpulse => {
+            let card = impulse.deck.pop();
+            match card {
+                // The division was valid
+                Some(c) => impulse.board.push(c),
+                // The division was invalid
+                None => self::println!("Empty deck!"),
+            }
+        }
         ActionType::DrawFromDeck => {
             let card = player.deck.pop();
             match card {
@@ -67,6 +87,7 @@ pub fn apply_action(snapshot: GameSnapshot, action: Action) -> GameSnapshot {
         }
     }
     let mut out = GameSnapshot {
+        impulse,
         p1: snapshot.p1.clone(),
         p2: snapshot.p2.clone(),
     };

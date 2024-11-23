@@ -29,4 +29,5 @@ pub fn render() {
     let delta = simulate_game(state.history.clone());
     render_player(delta.current.p1, delta.previous.p1, action_progress);
     render_player(delta.current.p2, delta.previous.p2, action_progress);
+    render_impulse(delta.current.impulse);
 }
