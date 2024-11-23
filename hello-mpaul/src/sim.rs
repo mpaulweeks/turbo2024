@@ -105,6 +105,15 @@ impl GameSim {
             }
             RoundPhase::Attack => {
                 // execute attacks
+                // todo weave these
+                let mut attacks = self.p1.attacks.clone();
+                attacks.append(&mut self.p2.attacks.clone());
+                for attack in attacks.iter() {
+                    self.execute_attack(attack.clone());
+                }
+                // clear attacks
+                self.p1.attacks = Vec::new();
+                self.p2.attacks = Vec::new();
                 // clear up dead and reset attacking
                 self.clear_dead(PlayerId::P1);
                 self.clear_dead(PlayerId::P2);
@@ -113,6 +122,38 @@ impl GameSim {
         }
         if start_phase != self.round_phase {
             return self.advance();
+        }
+    }
+
+    fn execute_attack(&mut self, attack: AttackState) {
+        let mut attacker = match attack.player_id {
+            PlayerId::P1 => self.p1.clone(),
+            PlayerId::P2 => self.p2.clone(),
+        };
+        let mut defender = match attack.player_id {
+            PlayerId::P1 => self.p2.clone(),
+            PlayerId::P2 => self.p1.clone(),
+        };
+        let attack_unit = attacker
+            .board
+            .iter_mut()
+            .find(|unit| unit.card.card_id == attack.source);
+        let defend_unit = defender
+            .board
+            .iter_mut()
+            .find(|unit| unit.card.card_id == attack.target);
+        if let Some(au) = attack_unit {
+            if let Some(du) = defend_unit {
+                let attack_power = au.power;
+                au.power = attack_power - du.power;
+                du.power = du.power - attack_power;
+            } else {
+                defender.health -= au.power;
+                match defender.player_id {
+                    PlayerId::P1 => self.p1 = defender,
+                    PlayerId::P2 => self.p2 = defender,
+                }
+            }
         }
     }
 
@@ -144,7 +185,8 @@ impl GameSim {
             }
             ActionType::DeclareAttack => {
                 player.targeting = None;
-                player.attacks.push(Attack {
+                player.attacks.push(AttackState {
+                    player_id: action.player_id.clone(),
                     source: action.card_id,
                     target: action.enemy_card_id,
                 });

@@ -11,10 +11,10 @@ pub enum PlayerId {
 #[derive(Clone)]
 pub struct PlayerState {
     pub player_id: PlayerId,
-    pub health: u8,
+    pub health: u32,
     row_board: u8,
     row_hand: u8,
-    pub attacks: Vec<Attack>,
+    pub attacks: Vec<AttackState>,
     pub board: Vec<UnitCard>,
     pub hand: Vec<UnitCard>,
     pub deck: Vec<UnitCard>,
