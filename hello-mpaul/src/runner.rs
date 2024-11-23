@@ -18,9 +18,17 @@ pub fn update() {
             state.history.action_ticks = MIN_ACTION_TICKS;
             state.history.actions.push(action);
         }
+    } else if mouse(0).right.just_pressed() {
+        if let Some(action) = click_action(logic_snapshot.p2.clone(), logic_snapshot.clone()) {
+            state.history.action_ticks = MIN_ACTION_TICKS;
+            state.history.actions.push(action);
+        }
     }
 
     state.save();
+
+    // log!("DEBUG: {:?}", state.history.actions);
+    // os::server::log!()
 }
 
 pub fn render() {

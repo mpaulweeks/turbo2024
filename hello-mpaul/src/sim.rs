@@ -48,6 +48,12 @@ impl GameSim {
         let start_phase = self.round_phase.clone();
         match start_phase {
             RoundPhase::Begin => {
+                // todo test
+                self.draw_impulse();
+                self.draw_impulse();
+                self.draw_impulse();
+                self.draw_impulse();
+                self.draw_impulse();
                 for _ in 0..3 {
                     self.draw_player(PlayerId::P1);
                     self.draw_player(PlayerId::P2);
@@ -67,10 +73,20 @@ impl GameSim {
             RoundPhase::Deploy => {
                 if self.p1.ready && self.p2.ready {
                     self.round_phase = RoundPhase::Plan;
+                    self.p1.ready = false;
+                    self.p2.ready = false;
                 }
             }
-            RoundPhase::Plan => {}
-            RoundPhase::Attack => {}
+            RoundPhase::Plan => {
+                if self.p1.ready && self.p2.ready {
+                    self.round_phase = RoundPhase::Plan;
+                    self.p1.ready = false;
+                    self.p2.ready = false;
+                }
+            }
+            RoundPhase::Attack => {
+                // execut attacks
+            }
         }
         if start_phase != self.round_phase {
             return self.advance();

@@ -55,7 +55,8 @@ pub fn position_player(p: PlayerState, game: GameSim) -> Vec<PositionedUnit> {
         });
     }
     for (i, c) in p.hand.iter().enumerate() {
-        let can_play = impulse_check(c.clone(), game.impulse.clone());
+        let can_play = game.round_phase == RoundPhase::Deploy
+            && impulse_check(c.clone(), game.impulse.clone());
         let unit_action = if can_play {
             Some(create_action_play_from_hand(
                 p.player_id.clone(),
@@ -115,6 +116,7 @@ fn tween_player(
 pub fn render_player(current: PlayerState, previous: PlayerState, percent: f32, game: GameSim) {
     let positioned = tween_player(current.clone(), previous, percent, game);
     for pcard in positioned.iter() {
-        render_unit(pcard.clone(), current.player_id == PlayerId::P1);
+        // todo forcing visible=true for local testing
+        render_unit(pcard.clone(), true);
     }
 }

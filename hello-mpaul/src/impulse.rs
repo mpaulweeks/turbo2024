@@ -27,24 +27,19 @@ pub fn create_impulse_deck() -> Vec<ImpulseCard> {
         (ImpulseType::Green, "VICard_ResourceGreen".to_string()),
         (ImpulseType::Blue, "VICard_ResourceNavy".to_string()),
     ]);
-    let colors = [
-        ImpulseType::Red,
-        ImpulseType::Red,
-        ImpulseType::Green,
-        ImpulseType::Green,
-        ImpulseType::Blue,
-        ImpulseType::Blue,
-    ];
+    let colors = [ImpulseType::Red, ImpulseType::Green, ImpulseType::Blue];
     let mut deck: Vec<ImpulseCard> = Vec::new();
     for resource in colors.iter() {
-        if let Some(sprite) = impulse_sprites.get(resource) {
-            deck.push(ImpulseCard {
-                resource: resource.clone(),
-                card: Card {
-                    card_id: deck.len() as u32 + 1,
-                    sprite: sprite.to_string(),
-                },
-            });
+        for _ in 0..4 {
+            if let Some(sprite) = impulse_sprites.get(resource) {
+                deck.push(ImpulseCard {
+                    resource: resource.clone(),
+                    card: Card {
+                        card_id: deck.len() as u32 + 1,
+                        sprite: sprite.to_string(),
+                    },
+                });
+            }
         }
     }
     return shuffle(deck);

@@ -38,6 +38,7 @@ pub fn simulate_game(game: GameHistory) -> GameDelta {
         previous = current.clone();
         current.advance();
         current.apply_action(action.clone());
+        current.advance();
     }
 
     return GameDelta { current, previous };
