@@ -11,6 +11,7 @@ pub enum PlayerId {
 #[derive(Clone)]
 pub struct PlayerState {
     pub player_id: PlayerId,
+    pub health: u8,
     row_board: u8,
     row_hand: u8,
     pub attacks: Vec<Attack>,
@@ -24,6 +25,7 @@ pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
     return PlayerState {
         row_board: if index == PlayerId::P1 { 3 } else { 1 },
         row_hand: if index == PlayerId::P1 { 4 } else { 0 },
+        health: 20,
         player_id: index,
         attacks: Vec::new(),
         board: Vec::new(),
@@ -131,4 +133,20 @@ pub fn render_player(current: PlayerState, previous: PlayerState, percent: f32, 
         // todo forcing visible=true for local testing
         render_unit(current.clone(), pcard.clone(), true);
     }
+
+    // health
+    let res = resolution();
+    let screen_width = res[0] as f32;
+    let screen_height = res[1] as f32;
+    let grid_width = screen_width * 0.8;
+    let panel_width = screen_width - grid_width;
+    text!(
+        &current.health.to_string(),
+        x = panel_width / 2.0,
+        y = match current.player_id {
+            PlayerId::P1 => screen_height * 0.35,
+            PlayerId::P2 => screen_height * 0.65,
+        },
+        font = Font::L,
+    )
 }

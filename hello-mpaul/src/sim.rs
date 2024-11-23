@@ -44,6 +44,25 @@ impl GameSim {
             PlayerId::P2 => self.p2 = player,
         }
     }
+    pub fn clear_dead(&mut self, player_id: PlayerId) {
+        let mut player = match player_id {
+            PlayerId::P1 => self.p1.clone(),
+            PlayerId::P2 => self.p2.clone(),
+        };
+        let mut new_board: Vec<UnitCard> = Vec::new();
+        for unit in player.board.iter() {
+            let mut new_unit = unit.clone();
+            new_unit.attacking = false;
+            if (new_unit.power > 0) {
+                new_board.push(new_unit);
+            }
+        }
+        player.board = new_board;
+        match player_id {
+            PlayerId::P1 => self.p1 = player,
+            PlayerId::P2 => self.p2 = player,
+        }
+    }
     pub fn advance(&mut self) {
         let start_phase = self.round_phase.clone();
         match start_phase {
@@ -79,13 +98,17 @@ impl GameSim {
             }
             RoundPhase::Plan => {
                 if self.p1.ready && self.p2.ready {
-                    self.round_phase = RoundPhase::Plan;
+                    self.round_phase = RoundPhase::Attack;
                     self.p1.ready = false;
                     self.p2.ready = false;
                 }
             }
             RoundPhase::Attack => {
-                // execut attacks
+                // execute attacks
+                // clear up dead and reset attacking
+                self.clear_dead(PlayerId::P1);
+                self.clear_dead(PlayerId::P2);
+                self.round_phase = RoundPhase::Draw;
             }
         }
         if start_phase != self.round_phase {
