@@ -27,7 +27,7 @@ turbo::init! {
 }
 
 turbo::go!({
-    let state = GameState::load();
+    let mut state = GameState::load();
     // let mut state = GameState::load();
 
     // let gp1 = gamepad(0);
@@ -38,9 +38,14 @@ turbo::go!({
     // if gp1.down.pressed() && state.card1.y + state.card1.height < screen_h {
     //     state.card1.y += paddle_speed;
     // }
+    let clicked = mouse(0).left.just_pressed();
+    if clicked {
+        state.p1 = process_click(state.p1);
+    }
 
     state.save();
 
+    // render
     let players = vec![state.p1, state.p2];
     for p in players.iter() {
         render_player(p.clone());
