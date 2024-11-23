@@ -25,7 +25,7 @@ pub fn create_ready_unit() -> UnitCard {
         attacking: false,
         card: Card {
             card_id: READY_CARD_ID,
-            sprite: "VICard_Back".to_string(),
+            sprite: "READY".to_string(),
         },
     };
 }
@@ -54,18 +54,24 @@ pub fn create_deck() -> Deck {
 const POWER_WIDTH: f32 = 15.0;
 const POWER_HEIGHT: f32 = 20.0;
 
-pub fn render_unit(punit: PositionedUnit, visible: bool) {
+pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
+    let is_ready = punit.unit.card.card_id == READY_CARD_ID;
+    let visible = visible || is_ready;
+    let highlight = if punit.unit.attacking {
+        Some(0xFF000080)
+    } else if is_ready && player.ready {
+        Some(0x00FF0080)
+    } else {
+        None
+    };
     render_card(
         punit.pos.clone(),
         punit.unit.card.sprite,
         visible,
-        if punit.unit.attacking {
-            Some(0xFF000080)
-        } else {
-            None
-        },
+        highlight,
     );
-    if visible && punit.unit.card.card_id != READY_CARD_ID {
+    if visible && !is_ready {
+        // draw unit details
         text!(
             &punit.unit.power.to_string(),
             x = -POWER_WIDTH + punit.pos.x + punit.pos.w / 2.0,

@@ -129,6 +129,6 @@ pub fn render_player(current: PlayerState, previous: PlayerState, percent: f32, 
     let positioned = tween_player(current.clone(), previous, percent, game);
     for pcard in positioned.iter() {
         // todo forcing visible=true for local testing
-        render_unit(pcard.clone(), true);
+        render_unit(current.clone(), pcard.clone(), true);
     }
 }
