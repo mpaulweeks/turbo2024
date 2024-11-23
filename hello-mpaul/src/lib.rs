@@ -9,24 +9,61 @@ turbo::cfg! {r#"
     api-url = "https://os.turbo.computer"
 "#}
 
-turbo::go!({
-    clear!(0xADD8E6FF);
-    let (x, y, w, h) = (36, 102, 60, 20);
-    let mut color = 0xFF0000FF;
-
-    let m = mouse(0);
-    //check if mouse is over the button and clicked
-    if (m.position[0] >= x && m.position[0] <= x + w)
-        && (m.position[1] >= y && m.position[1] <= y + h)
-    {
-        color = 0x4169E1FF;
-        if m.left.just_pressed() {
-            os::client::exec("hello-mpaul", "hello", &[]);
-        }
+turbo::init! {
+  struct GameState {
+    paddle1: struct Paddle {
+      x: f32,
+      y: f32,
+      height: f32,
+    },
+    paddle2: Paddle,
+  } = {
+    let res = resolution();
+    let w = res[0] as f32;
+    let h = res[1] as f32;
+    let paddle_width = 5.0;
+    let paddle_height = 10.0;
+    Self {
+      paddle1: Paddle { x: 10.0, y: h / 2.0 - paddle_height / 2.0, height: paddle_height },
+      paddle2: Paddle { x: w - paddle_width - 10.0, y: h / 2.0 - paddle_height / 2.0, height: paddle_height },
     }
-    //draw a button
-    rect!(x = x, y = y, w = w, h = h, color = color, border_radius = 8);
-    text!("HELLO!!", x = 50, y = 109);
+  }
+}
+
+turbo::go!({
+    let mut state = GameState::load();
+
+    let paddle_speed = 4.0;
+
+    let res = resolution();
+    let screen_h = res[1] as f32;
+
+    let gp1 = gamepad(0);
+
+    // Move paddle 1
+    if gp1.up.pressed() && state.paddle1.y > 0.0 {
+        state.paddle1.y -= paddle_speed;
+    }
+    if gp1.down.pressed() && state.paddle1.y + state.paddle1.height < screen_h {
+        state.paddle1.y += paddle_speed;
+    }
+
+    state.save();
+
+    rect!(
+        x = state.paddle1.x,
+        y = state.paddle1.y,
+        w = 8,
+        h = state.paddle1.height,
+        color = 0xffffffff
+    );
+    rect!(
+        x = state.paddle2.x,
+        y = state.paddle2.y,
+        w = 8,
+        h = state.paddle2.height,
+        color = 0xffffffff
+    );
 });
 
 #[export_name = "turbo/hello"]
