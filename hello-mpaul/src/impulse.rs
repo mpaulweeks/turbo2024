@@ -64,3 +64,7 @@ pub fn render_impulse(state: ImpulseState) {
         render_card(pcard, true);
     }
 }
+
+pub fn impulse_check(card: Card, state: ImpulseState) -> bool {
+    return true;
+}
