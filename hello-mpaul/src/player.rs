@@ -1,15 +1,19 @@
 use crate::*;
 
-pub type PlayerId = u8;
+#[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
+pub enum PlayerId {
+    P1,
+    P2,
+}
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct Player {
-    player_id: PlayerId,
+    pub player_id: PlayerId,
     row_board: u8,
     row_hand: u8,
-    board: Vec<Card>,
-    hand: Vec<Card>,
-    deck: Vec<Card>,
+    pub board: Vec<Card>,
+    pub hand: Vec<Card>,
+    pub deck: Vec<Card>,
 }
 
 pub struct PositionedPlayer {
@@ -20,7 +24,7 @@ pub struct PositionedPlayer {
 pub fn create_player(index: PlayerId) -> Player {
     let mut deck = create_deck();
     let mut hand: Vec<Card> = Vec::new();
-    for n in 0..5 {
+    for _ in 0..5 {
         let card = deck.pop();
         match card {
             // The division was valid
@@ -30,9 +34,9 @@ pub fn create_player(index: PlayerId) -> Player {
         }
     }
     return Player {
-        player_id: index,
-        row_board: if index == 0 { 2 } else { 1 },
-        row_hand: if index == 0 { 3 } else { 0 },
+        player_id: index.clone(),
+        row_board: if index == PlayerId::P1 { 2 } else { 1 },
+        row_hand: if index == PlayerId::P2 { 3 } else { 0 },
         board: Vec::new(),
         hand: hand,
         deck: deck,
@@ -97,9 +101,9 @@ pub fn click_action(p: Player) -> Option<Action> {
 pub fn render_player(p: Player) {
     let positioned = position_player(p.clone());
     for pcard in positioned.phand.iter() {
-        render_card(pcard.clone(), p.player_id == 0);
+        render_card(pcard.clone(), p.player_id == PlayerId::P1);
     }
     for pcard in positioned.pboard.iter() {
-        render_card(pcard.clone(), p.player_id == 0);
+        render_card(pcard.clone(), p.player_id == PlayerId::P2);
     }
 }

@@ -26,8 +26,8 @@ turbo::init! {
     p2: Player,
   } = {
     Self {
-      p1: create_player(0),
-      p2: create_player(1),
+      p1: create_player(PlayerId::P1),
+      p2: create_player(PlayerId::P2),
     }
   }
 }
