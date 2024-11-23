@@ -8,3 +8,6 @@ turbo = { version = "*", package = "turbo-genesis-sdk" }
 
 [lib]
 crate-type = ["cdylib"]
+
+[card]
+crate-type = ["cdylib"]
