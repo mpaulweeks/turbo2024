@@ -22,11 +22,12 @@ pub fn position_card(row: u8, col: usize, action: Option<Action>) -> CardPositio
     let res = resolution();
     let screen_width = res[0] as f32;
     let screen_height = res[1] as f32;
-    let slot_width = screen_width / 8.0;
+    let grid_width = screen_width * 0.8;
+    let slot_width = grid_width / 8.0;
     let slot_height = screen_height / 5.0;
     let card_width = 80.0;
     let card_height = 112.0;
-    let x = slot_width * (col as f32 + 0.5);
+    let x = (screen_width - grid_width) + slot_width * (col as f32 + 0.5);
     let y = slot_height * (row as f32 + 0.5);
     let left = (x - card_width / 2.0) as i32;
     let right = (x + card_width / 2.0) as i32;

@@ -27,6 +27,39 @@ pub fn render() {
     let state = GameState::load();
     let action_progress = (state.history.action_ticks - MIN_ACTION_TICKS) / MAX_ACTION_TICKS;
     let delta = simulate_game(state.history.clone());
+
+    // render board background
+    let res = resolution();
+    let screen_width = res[0] as f32;
+    let screen_height = res[1] as f32;
+    let grid_width = screen_width * 0.8;
+    let panel_width = screen_width - grid_width;
+    rect!(
+        x = 0,
+        y = 0,
+        w = panel_width,
+        h = screen_height,
+        color = 0x404040ff,
+    );
+    rect!(
+        x = panel_width,
+        y = 0,
+        w = grid_width,
+        h = screen_height,
+        color = 0x004000ff,
+    );
+
+    // buttons
+    let margin = panel_width * 0.2;
+    rect!(
+        x = margin,
+        y = margin,
+        w = panel_width - margin * 2.0,
+        h = margin,
+        color = 0x000000ff,
+        border_radius = 5,
+    );
+
     render_player(
         delta.current.clone().p1,
         delta.previous.p1,

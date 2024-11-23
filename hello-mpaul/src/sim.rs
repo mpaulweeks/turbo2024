@@ -48,7 +48,6 @@ impl GameSim {
         let start_phase = self.round_phase.clone();
         match start_phase {
             RoundPhase::Begin => {
-                self.draw_impulse();
                 for _ in 0..3 {
                     self.draw_player(PlayerId::P1);
                     self.draw_player(PlayerId::P2);
