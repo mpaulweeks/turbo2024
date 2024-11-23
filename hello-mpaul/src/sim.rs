@@ -234,5 +234,13 @@ pub fn render_round(state: GameSim) {
         RoundPhase::Plan => "Plan",
         RoundPhase::Attack => "Attack",
     };
-    text!(message, x = 10, y = 10, font = Font::L)
+    let res = resolution();
+    let screen_width = res[0] as f32;
+    let screen_height = res[1] as f32;
+    text!(
+        message,
+        x = screen_width * 0.05,
+        y = screen_height / 2.0,
+        font = Font::L
+    )
 }

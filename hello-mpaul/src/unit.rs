@@ -61,6 +61,9 @@ const CLOCK_HEIGHT: f32 = 16.0;
 const CLOCK_MARGIN_X: f32 = 7.0;
 const CLOCK_MARGIN_Y: f32 = -5.0;
 
+const MANA_WIDTH: f32 = 8.0;
+const MANA_MARGIN: f32 = 0.0;
+
 pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
     let is_ready = punit.unit.card.card_id == READY_CARD_ID;
     let visible = visible || is_ready;
@@ -96,6 +99,24 @@ pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
             x = punit.pos.x + punit.pos.w / 2.0 - (CLOCK_WIDTH + CLOCK_MARGIN_X),
             y = punit.pos.y - punit.pos.h / 2.0 - (CLOCK_MARGIN_Y),
         );
+
+        let mut impulse_types: Vec<ImpulseType> = Vec::new();
+        for tuple in punit.unit.impulse_cost.iter() {
+            let (it, num) = tuple;
+            for _ in 0..(*num as i32) {
+                impulse_types.push(it.clone());
+            }
+        }
+        for (index, it) in impulse_types.iter().enumerate() {
+            sprite!(
+                &get_mana_sprite(it.clone()),
+                x = punit.pos.x + punit.pos.w / 2.0
+                    - (CLOCK_WIDTH
+                        + CLOCK_MARGIN_X
+                        + ((MANA_MARGIN + MANA_WIDTH) * (index as f32 + 1.0))),
+                y = punit.pos.y - punit.pos.h / 2.0 + (MANA_MARGIN),
+            );
+        }
     }
 }
 

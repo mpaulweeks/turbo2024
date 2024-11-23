@@ -44,3 +44,12 @@ pub fn get_clock_sprite(impulse_turn: usize) -> String {
     ];
     return all.get(impulse_turn).unwrap().clone();
 }
+
+pub fn get_mana_sprite(impulse_type: ImpulseType) -> String {
+    return match impulse_type {
+        ImpulseType::Blue => "Mana_Sprites1".to_string(),
+        ImpulseType::Red => "Mana_Sprites2".to_string(),
+        ImpulseType::Green => "Mana_Sprites3".to_string(),
+        // ImpulseType::Blue => "Mana_Sprites4".to_string(),
+    };
+}
