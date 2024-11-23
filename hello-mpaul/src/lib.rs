@@ -14,6 +14,8 @@ mod runner;
 use runner::*;
 mod sim;
 use sim::*;
+mod ui;
+use ui::*;
 mod unit;
 use unit::*;
 mod util;

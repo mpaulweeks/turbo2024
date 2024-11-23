@@ -51,8 +51,10 @@ pub fn create_deck() -> Deck {
     return shuffle(deck);
 }
 
-const POWER_WIDTH: f32 = 15.0;
-const POWER_HEIGHT: f32 = 20.0;
+const POWER_WIDTH: f32 = 16.0;
+const POWER_HEIGHT: f32 = 32.0;
+const POWER_MARGIN_X: f32 = 5.0;
+const POWER_MARGIN_Y: f32 = 2.0;
 
 pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
     let is_ready = punit.unit.card.card_id == READY_CARD_ID;
@@ -78,13 +80,12 @@ pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
         highlight,
     );
     if visible && !is_ready {
+        let power_sprite = get_atk_sprite(punit.unit.power);
         // draw unit details
-        text!(
-            &punit.unit.power.to_string(),
-            x = -POWER_WIDTH + punit.pos.x + punit.pos.w / 2.0,
-            y = -POWER_HEIGHT + punit.pos.y + punit.pos.h / 2.0,
-            color = 0xffffffff,
-            font = Font::L,
+        sprite!(
+            &power_sprite,
+            x = punit.pos.x + punit.pos.w / 2.0 - (POWER_WIDTH + POWER_MARGIN_X),
+            y = punit.pos.y + punit.pos.h / 2.0 - (POWER_HEIGHT + POWER_MARGIN_Y),
         );
     }
 }
