@@ -79,11 +79,13 @@ pub fn tween_card(
     previous: PositionedCard,
     percent: f32,
 ) -> PositionedCard {
+    // https://stackoverflow.com/a/25730573
+    let ease = percent * percent * (3.0 - 2.0 * percent);
     return PositionedCard {
-        x: tween(previous.x, current.x, percent),
-        y: tween(previous.y, current.y, percent),
-        w: tween(previous.w, current.w, percent),
-        h: tween(previous.h, current.h, percent),
+        x: tween(previous.x, current.x, ease),
+        y: tween(previous.y, current.y, ease),
+        w: tween(previous.w, current.w, ease),
+        h: tween(previous.h, current.h, ease),
         hover: current.hover,
         card: current.card,
     };

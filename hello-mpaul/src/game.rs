@@ -1,45 +1,32 @@
 use crate::*;
 
-#[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
-pub struct GameHistory {
-    impulse_deck: Deck,
-    p1deck: Deck,
-    p2deck: Deck,
-    pub action_time: f32,
-    pub actions: Vec<Action>,
-}
+const MIN_ACTION_TICKS: f32 = 0.0;
+const MAX_ACTION_TICKS: f32 = 60.0;
 
-pub fn create_game() -> GameHistory {
-    let mut starting_actions: Vec<Action> = Vec::new();
-    for _ in 0..4 {
-        starting_actions.push(action_draw_from_deck(PlayerId::P1));
-        starting_actions.push(action_draw_from_deck(PlayerId::P2));
-    }
-    return GameHistory {
-        impulse_deck: Vec::new(), // todo
-        p1deck: create_deck(),
-        p2deck: create_deck(),
-        action_time: 0.0,
-        actions: starting_actions,
-    };
-}
+pub fn update() {
+    let mut state = GameState::load();
+    let logic_snapshot = simulate_game(state.history.clone()).current;
 
-pub struct GameDelta {
-    pub current: GameSnapshot,
-    pub previous: GameSnapshot,
-}
+    state.history.action_ticks =
+        (state.history.action_ticks + 1.0).clamp(MIN_ACTION_TICKS, MAX_ACTION_TICKS);
 
-pub fn simulate_game(game: GameHistory) -> GameDelta {
-    let mut current = GameSnapshot {
-        p1: create_player(PlayerId::P1, game.p1deck),
-        p2: create_player(PlayerId::P2, game.p2deck),
-    };
-    let mut previous = current.clone();
-
-    for action in game.actions.iter() {
-        previous = current.clone();
-        current = apply_action(current, action.clone());
+    // todo prevent actions while waiting for animation?
+    if gamepad(0).a.just_pressed() {
+        state.history.actions.pop();
+    } else if mouse(0).left.just_pressed() {
+        if let Some(action) = click_action(logic_snapshot.p1) {
+            state.history.action_ticks = MIN_ACTION_TICKS;
+            state.history.actions.push(action);
+        }
     }
 
-    return GameDelta { current, previous };
+    state.save();
+}
+
+pub fn render() {
+    let state = GameState::load();
+    let action_progress = (state.history.action_ticks - MIN_ACTION_TICKS) / MAX_ACTION_TICKS;
+    let delta = simulate_game(state.history.clone());
+    render_player(delta.current.p1, delta.previous.p1, action_progress);
+    render_player(delta.current.p2, delta.previous.p2, action_progress);
 }
