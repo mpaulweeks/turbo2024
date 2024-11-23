@@ -1,9 +1,12 @@
 use crate::*;
 
+type UnitCost = Vec<(ImpulseType, usize)>;
+
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct UnitCard {
+    pub impulse_cost: UnitCost,
     pub impulse_turn: usize,
-    pub impulse_type: ImpulseType,
+    pub power: u32,
     pub card: Card,
 }
 
@@ -14,8 +17,9 @@ pub fn create_deck() -> Deck {
     for ud in drafts.iter() {
         for _ in 0..3 {
             deck.push(UnitCard {
+                power: ud.power,
                 impulse_turn: ud.impulse_turn,
-                impulse_type: ud.impulse_type.clone(),
+                impulse_cost: ud.impulse_cost.clone(),
                 card: Card {
                     card_id: deck.len() as u32 + 1,
                     sprite: ud.sprite.clone(),
@@ -27,51 +31,60 @@ pub fn create_deck() -> Deck {
 }
 
 struct UnitDraft {
+    impulse_cost: UnitCost,
     impulse_turn: usize,
-    impulse_type: ImpulseType,
+    power: u32,
     sprite: String,
 }
 
 fn unique_cards() -> Vec<UnitDraft> {
     return vec![
         UnitDraft {
-            impulse_turn: 1,
-            impulse_type: ImpulseType::Blue,
+            impulse_cost: vec![(ImpulseType::Red, 3)],
+            impulse_turn: 5,
+            power: 5,
             sprite: "Chancellor_Tenn".to_string(),
         },
         UnitDraft {
-            impulse_turn: 1,
-            impulse_type: ImpulseType::Blue,
+            impulse_cost: vec![(ImpulseType::Blue, 1)],
+            impulse_turn: 5,
+            power: 3,
             sprite: "Jack_of_Club".to_string(),
         },
         UnitDraft {
-            impulse_turn: 1,
-            impulse_type: ImpulseType::Blue,
+            impulse_cost: vec![(ImpulseType::Red, 1)],
+            impulse_turn: 5,
+            power: 3,
             sprite: "Jack_of_Diamond".to_string(),
         },
         UnitDraft {
-            impulse_turn: 1,
-            impulse_type: ImpulseType::Blue,
+            impulse_cost: vec![(ImpulseType::Red, 1)],
+            impulse_turn: 5,
+            power: 3,
             sprite: "Jack_of_Heart".to_string(),
         },
         UnitDraft {
+            impulse_cost: vec![(ImpulseType::Blue, 3)],
             impulse_turn: 3,
-            impulse_type: ImpulseType::Blue,
+            power: 4,
             sprite: "Jack_of_Spade".to_string(),
         },
         UnitDraft {
+            impulse_cost: vec![(ImpulseType::Red, 3), (ImpulseType::Blue, 1)],
             impulse_turn: 10,
-            impulse_type: ImpulseType::Blue,
+            power: 9,
             sprite: "King_Chance".to_string(),
         },
         UnitDraft {
+            impulse_cost: vec![],
             impulse_turn: 8,
-            impulse_type: ImpulseType::Blue,
+            power: 6,
             sprite: "Queen_Card".to_string(),
         },
         UnitDraft {
-            impulse_turn: 1,
-            impulse_type: ImpulseType::Blue,
+            impulse_cost: vec![],
+            impulse_turn: 3,
+            power: 2,
             sprite: "TangoNiner".to_string(),
         },
     ];

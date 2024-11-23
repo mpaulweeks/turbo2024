@@ -67,5 +67,18 @@ pub fn render_impulse(state: ImpulseState) {
 pub fn impulse_check(unit: UnitCard, state: ImpulseState) -> bool {
     let impulse_types: Vec<ImpulseType> =
         state.board.iter().map(|ic| ic.resource.clone()).collect();
-    return unit.impulse_turn <= impulse_types.len() && impulse_types.contains(&unit.impulse_type);
+    if unit.impulse_turn > impulse_types.len() {
+        return false;
+    }
+    let mut impulse_counts: HashMap<ImpulseType, usize> = HashMap::new();
+    for it in impulse_types.iter() {
+        *impulse_counts.entry(it.clone()).or_default() += 1;
+    }
+    let mut can_afford = true;
+    for cost in unit.impulse_cost.iter() {
+        let (it, num) = cost;
+        let count = *impulse_counts.entry(it.clone()).or_default();
+        can_afford = can_afford && count >= *num;
+    }
+    return can_afford;
 }
