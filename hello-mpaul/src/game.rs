@@ -13,6 +13,8 @@ pub fn update() {
     // todo prevent actions while waiting for animation?
     if gamepad(0).a.just_pressed() {
         state.history.actions.pop();
+    } else if gamepad(0).b.just_pressed() {
+        state.history.actions.push(create_action_draw_impulse());
     } else if mouse(0).left.just_pressed() {
         if let Some(action) = click_action(logic_snapshot.p1.clone(), logic_snapshot.clone()) {
             state.history.action_ticks = MIN_ACTION_TICKS;

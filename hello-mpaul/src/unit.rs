@@ -21,6 +21,5 @@ pub fn create_deck() -> Deck {
             },
         });
     }
-    // todo shuffle
-    return deck;
+    return shuffle(deck);
 }

@@ -47,8 +47,7 @@ pub fn create_impulse_deck() -> Vec<ImpulseCard> {
             });
         }
     }
-    // todo shuffle
-    return deck;
+    return shuffle(deck);
 }
 
 pub fn create_impulse_state(deck: Vec<ImpulseCard>) -> ImpulseState {

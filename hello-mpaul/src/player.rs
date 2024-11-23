@@ -37,7 +37,10 @@ pub fn position_player(p: PlayerState, game: GameSnapshot) -> Vec<PositionedCard
     for (i, c) in p.hand.iter().enumerate() {
         let can_play = impulse_check(c.clone(), game.impulse.clone());
         let action = if can_play {
-            Some(action_play_from_hand(p.player_id.clone(), c.card.card_id))
+            Some(create_action_play_from_hand(
+                p.player_id.clone(),
+                c.card.card_id,
+            ))
         } else {
             None
         };

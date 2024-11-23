@@ -12,6 +12,8 @@ mod player;
 use player::*;
 mod unit;
 use unit::*;
+mod util;
+use util::*;
 
 turbo::cfg! {r#"
     name = "hello-mpaul"

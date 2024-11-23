@@ -14,7 +14,7 @@ pub struct Action {
     card_id: u32,
 }
 
-pub fn action_draw_impulse() -> Action {
+pub fn create_action_draw_impulse() -> Action {
     return Action {
         action_type: ActionType::DrawImpulse,
         player_id: PlayerId::P1,
@@ -22,7 +22,7 @@ pub fn action_draw_impulse() -> Action {
     };
 }
 
-pub fn action_draw_from_deck(player_id: PlayerId) -> Action {
+pub fn create_action_draw_from_deck(player_id: PlayerId) -> Action {
     return Action {
         action_type: ActionType::DrawFromDeck,
         player_id,
@@ -30,7 +30,7 @@ pub fn action_draw_from_deck(player_id: PlayerId) -> Action {
     };
 }
 
-pub fn action_play_from_hand(player_id: PlayerId, card_id: CardId) -> Action {
+pub fn create_action_play_from_hand(player_id: PlayerId, card_id: CardId) -> Action {
     return Action {
         action_type: ActionType::PlayFromHand,
         player_id,

@@ -11,10 +11,10 @@ pub struct GameHistory {
 
 pub fn create_game() -> GameHistory {
     let mut starting_actions: Vec<Action> = Vec::new();
-    starting_actions.push(action_draw_impulse());
+    starting_actions.push(create_action_draw_impulse());
     for _ in 0..4 {
-        starting_actions.push(action_draw_from_deck(PlayerId::P1));
-        starting_actions.push(action_draw_from_deck(PlayerId::P2));
+        starting_actions.push(create_action_draw_from_deck(PlayerId::P1));
+        starting_actions.push(create_action_draw_from_deck(PlayerId::P2));
     }
     return GameHistory {
         impulse_deck: create_impulse_deck(),
