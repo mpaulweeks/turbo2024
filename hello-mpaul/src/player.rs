@@ -38,14 +38,15 @@ pub fn create_player(index: u8) -> Player {
 }
 
 pub fn position_player(p: Player) -> PositionedPlayer {
+    let mut pboard: Vec<PositionedCard> = Vec::new();
     let mut phand: Vec<PositionedCard> = Vec::new();
+    for (i, c) in p.board.iter().enumerate() {
+        pboard.push(position_card(c.clone(), p.row_board, i));
+    }
     for (i, c) in p.hand.iter().enumerate() {
         phand.push(position_card(c.clone(), p.row_hand, i));
     }
-    return PositionedPlayer {
-        phand,
-        pboard: Vec::new(),
-    };
+    return PositionedPlayer { pboard, phand };
 }
 
 pub fn process_click(p: Player) -> Player {
