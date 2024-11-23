@@ -2,7 +2,17 @@ use crate::*;
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct Card {
-    pub sprite: String,
+    sprite: String,
+}
+
+#[derive(Clone)]
+pub struct PositionedCard {
+    x: f32,
+    y: f32,
+    w: f32,
+    h: f32,
+    hover: bool,
+    card: Card,
 }
 
 pub fn create_deck() -> Vec<Card> {
@@ -31,7 +41,7 @@ pub fn create_deck() -> Vec<Card> {
     ];
 }
 
-pub fn render_card(p: Card, row: u8, column: usize, visible: bool) {
+pub fn position_card(card: Card, row: u8, column: usize) -> PositionedCard {
     let res = resolution();
     let screen_width = res[0] as f32;
     let screen_height = res[1] as f32;
@@ -41,23 +51,44 @@ pub fn render_card(p: Card, row: u8, column: usize, visible: bool) {
     let card_height = 112.0;
     let x = slot_width * (column as f32 + 0.5);
     let y = slot_height * (row as f32 + 0.5);
-    rect!(
-        x = x - (slot_width * 0.95 / 2.0),
-        y = y - (slot_height * 0.95 / 2.0),
-        w = slot_width * 0.95,
-        h = slot_height * 0.95,
-        color = 0xffffff80
-    );
+    let left = (x - card_width / 2.0) as i32;
+    let right = (x + card_width / 2.0) as i32;
+    let top = (y - card_height / 2.0) as i32;
+    let bottom = (y + card_height / 2.0) as i32;
+    let [mx, my] = mouse(0).position;
+    let hover = mx > left && mx < right && my > top && my < bottom;
+    return PositionedCard {
+        x,
+        y,
+        w: card_width,
+        h: card_height,
+        hover,
+        card,
+    };
+}
+
+pub fn render_card(pcard: PositionedCard, visible: bool) {
+    if pcard.hover {
+        let margin = pcard.w * 0.2;
+        rect!(
+            x = pcard.x - (pcard.w + margin) / 2.0,
+            y = pcard.y - (pcard.h + margin) / 2.0,
+            w = pcard.w + margin,
+            h = pcard.h + margin,
+            color = 0x8080ffff,
+            border_radius = 10,
+        );
+    }
     let sprite_name = if visible {
-        p.sprite
+        pcard.card.sprite
     } else {
         "VICard_Back".to_string()
     };
     sprite!(
         &sprite_name,
-        x = x - (card_width / 2.0),
-        y = y - (card_height / 2.0),
-        w = card_width,
-        h = card_height
+        x = pcard.x - (pcard.w / 2.0),
+        y = pcard.y - (pcard.h / 2.0),
+        w = pcard.w,
+        h = pcard.h,
     );
 }

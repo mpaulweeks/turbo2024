@@ -30,8 +30,17 @@ pub fn create_player(index: u8) -> Player {
     };
 }
 
-pub fn render_player(p: Player) {
+pub fn get_positioned_cards(p: Player) -> Vec<PositionedCard> {
+    let mut out: Vec<PositionedCard> = Vec::new();
     for (i, c) in p.hand.iter().enumerate() {
-        render_card(c.clone(), p.row_hand, i, p.index == 0);
+        out.push(position_card(c.clone(), p.row_hand, i));
+    }
+    return out;
+}
+
+pub fn render_player(p: Player) {
+    let positioned = get_positioned_cards(p.clone());
+    for pcard in positioned.iter() {
+        render_card(pcard.clone(), p.index == 0);
     }
 }
