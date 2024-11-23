@@ -10,3 +10,9 @@ game jammin
 helpful rust docs
 
 - https://www.sheshbabu.com/posts/rust-module-system/
+
+## paul todo
+
+- attack order
+- draw line when declaring attack
+- animate combat somehow????
