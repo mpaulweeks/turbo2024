@@ -1,8 +1,10 @@
 use crate::*;
 
+pub type PlayerId = u8;
+
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct Player {
-    index: u8,
+    player_id: PlayerId,
     row_board: u8,
     row_hand: u8,
     board: Vec<Card>,
@@ -15,7 +17,7 @@ pub struct PositionedPlayer {
     pboard: Vec<PositionedCard>,
 }
 
-pub fn create_player(index: u8) -> Player {
+pub fn create_player(index: PlayerId) -> Player {
     let mut deck = create_deck();
     let mut hand: Vec<Card> = Vec::new();
     for n in 0..5 {
@@ -28,7 +30,7 @@ pub fn create_player(index: u8) -> Player {
         }
     }
     return Player {
-        index: index,
+        player_id: index,
         row_board: if index == 0 { 2 } else { 1 },
         row_hand: if index == 0 { 3 } else { 0 },
         board: Vec::new(),
@@ -55,12 +57,12 @@ pub fn process_click(p: Player) -> Player {
         .phand
         .iter()
         .filter(|pcard| pcard.hover)
-        .map(|pcard| pcard.card.instance_id)
+        .map(|pcard| pcard.card.card_id)
         .collect();
     let mut new_board = p.board.to_vec();
     let mut new_hand: Vec<Card> = Vec::new();
     for card in p.hand.iter() {
-        let is_hover = hovered.contains(&card.instance_id);
+        let is_hover = hovered.contains(&card.card_id);
         if is_hover {
             new_board.push(card.clone());
         } else {
@@ -68,7 +70,7 @@ pub fn process_click(p: Player) -> Player {
         }
     }
     return Player {
-        index: p.index,
+        player_id: p.player_id,
         row_hand: p.row_hand,
         row_board: p.row_board,
         board: new_board,
@@ -77,12 +79,27 @@ pub fn process_click(p: Player) -> Player {
     };
 }
 
+pub fn click_action(p: Player) -> Option<Action> {
+    let positioned = position_player(p.clone());
+    let hovered: Vec<CardId> = positioned
+        .phand
+        .iter()
+        .filter(|pcard| pcard.hover)
+        .map(|pcard| pcard.card.card_id)
+        .collect();
+    if let Some(clicked) = hovered.first() {
+        return Some(action_play_from_hand(p.player_id, *clicked));
+    } else {
+        return None;
+    }
+}
+
 pub fn render_player(p: Player) {
     let positioned = position_player(p.clone());
     for pcard in positioned.phand.iter() {
-        render_card(pcard.clone(), p.index == 0);
+        render_card(pcard.clone(), p.player_id == 0);
     }
     for pcard in positioned.pboard.iter() {
-        render_card(pcard.clone(), p.index == 0);
+        render_card(pcard.clone(), p.player_id == 0);
     }
 }

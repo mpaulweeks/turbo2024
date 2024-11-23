@@ -1,8 +1,10 @@
 use crate::*;
 
+pub type CardId = u32;
+
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct Card {
-    pub instance_id: u32,
+    pub card_id: CardId,
     pub sprite: String,
 }
 
