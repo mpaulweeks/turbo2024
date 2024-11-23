@@ -22,37 +22,30 @@ turbo::cfg! {r#"
 
 turbo::init! {
   struct GameState {
-    p1: Player,
-    p2: Player,
+    history: GameHistory,
   } = {
     Self {
-      p1: create_player(PlayerId::P1),
-      p2: create_player(PlayerId::P2),
+      history: create_game(),
     }
   }
 }
 
 turbo::go!({
     let mut state = GameState::load();
-    // let mut state = GameState::load();
+    let logic_snapshot = simulate_game(state.history.clone());
 
-    // let gp1 = gamepad(0);
-
-    // if gp1.up.pressed() && state.card1.y > 0.0 {
-    //     state.card1.y -= paddle_speed;
-    // }
-    // if gp1.down.pressed() && state.card1.y + state.card1.height < screen_h {
-    //     state.card1.y += paddle_speed;
-    // }
     let clicked = mouse(0).left.just_pressed();
     if clicked {
-        state.p1 = process_click(state.p1);
+        if let Some(action) = click_action(logic_snapshot.p1) {
+            state.history.actions.push(action);
+        }
     }
 
     state.save();
 
     // render
-    let players = vec![state.p1, state.p2];
+    let render_snapshot = simulate_game(state.history.clone());
+    let players = vec![render_snapshot.p1, render_snapshot.p2];
     for p in players.iter() {
         render_player(p.clone());
     }

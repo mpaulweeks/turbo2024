@@ -1,16 +1,24 @@
 use crate::*;
 
-#[derive(Clone)]
+#[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 enum ActionType {
     DrawFromDeck,
     PlayFromHand,
 }
 
-#[derive(Clone)]
+#[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct Action {
     action_type: ActionType,
     player_id: PlayerId,
     card_id: u32,
+}
+
+pub fn action_draw_from_deck(player_id: PlayerId) -> Action {
+    return Action {
+        action_type: ActionType::DrawFromDeck,
+        player_id,
+        card_id: 0,
+    };
 }
 
 pub fn action_play_from_hand(player_id: PlayerId, card_id: CardId) -> Action {

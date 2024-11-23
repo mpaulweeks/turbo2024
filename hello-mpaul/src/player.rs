@@ -6,7 +6,7 @@ pub enum PlayerId {
     P2,
 }
 
-#[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
+#[derive(Clone)]
 pub struct Player {
     pub player_id: PlayerId,
     row_board: u8,
@@ -21,25 +21,14 @@ pub struct PositionedPlayer {
     pboard: Vec<PositionedCard>,
 }
 
-pub fn create_player(index: PlayerId) -> Player {
-    let mut deck = create_deck();
-    let mut hand: Vec<Card> = Vec::new();
-    for _ in 0..5 {
-        let card = deck.pop();
-        match card {
-            // The division was valid
-            Some(c) => hand.push(c),
-            // The division was invalid
-            None => self::println!("Empty deck!"),
-        }
-    }
+pub fn create_player(index: PlayerId, deck: Deck) -> Player {
     return Player {
-        player_id: index.clone(),
         row_board: if index == PlayerId::P1 { 2 } else { 1 },
-        row_hand: if index == PlayerId::P2 { 3 } else { 0 },
+        row_hand: if index == PlayerId::P1 { 3 } else { 0 },
+        player_id: index,
         board: Vec::new(),
-        hand: hand,
-        deck: deck,
+        hand: Vec::new(),
+        deck,
     };
 }
 
@@ -53,34 +42,6 @@ pub fn position_player(p: Player) -> PositionedPlayer {
         phand.push(position_card(c.clone(), p.row_hand, i));
     }
     return PositionedPlayer { pboard, phand };
-}
-
-pub fn process_click(p: Player) -> Player {
-    let positioned = position_player(p.clone());
-    let hovered: Vec<u32> = positioned
-        .phand
-        .iter()
-        .filter(|pcard| pcard.hover)
-        .map(|pcard| pcard.card.card_id)
-        .collect();
-    let mut new_board = p.board.to_vec();
-    let mut new_hand: Vec<Card> = Vec::new();
-    for card in p.hand.iter() {
-        let is_hover = hovered.contains(&card.card_id);
-        if is_hover {
-            new_board.push(card.clone());
-        } else {
-            new_hand.push(card.clone());
-        }
-    }
-    return Player {
-        player_id: p.player_id,
-        row_hand: p.row_hand,
-        row_board: p.row_board,
-        board: new_board,
-        hand: new_hand,
-        deck: p.deck,
-    };
 }
 
 pub fn click_action(p: Player) -> Option<Action> {
@@ -104,6 +65,6 @@ pub fn render_player(p: Player) {
         render_card(pcard.clone(), p.player_id == PlayerId::P1);
     }
     for pcard in positioned.pboard.iter() {
-        render_card(pcard.clone(), p.player_id == PlayerId::P2);
+        render_card(pcard.clone(), p.player_id == PlayerId::P1);
     }
 }
