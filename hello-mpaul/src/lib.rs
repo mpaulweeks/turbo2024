@@ -15,6 +15,7 @@ turbo::init! {
       x: f32,
       y: f32,
       height: f32,
+      color: u32,
     },
     paddle2: Paddle,
   } = {
@@ -24,10 +25,14 @@ turbo::init! {
     let paddle_width = 5.0;
     let paddle_height = 10.0;
     Self {
-      paddle1: Paddle { x: 10.0, y: h / 2.0 - paddle_height / 2.0, height: paddle_height },
-      paddle2: Paddle { x: w - paddle_width - 10.0, y: h / 2.0 - paddle_height / 2.0, height: paddle_height },
+      paddle1: Paddle { x: 10.0, y: h / 2.0 - paddle_height / 2.0, height: paddle_height, color: 0xFF0000FF },
+      paddle2: Paddle { x: w - paddle_width - 10.0, y: h / 2.0 - paddle_height / 2.0, height: paddle_height, color: 0x0000FFFF },
     }
   }
+}
+
+fn render_paddle(p: Paddle) {
+    rect!(x = p.x, y = p.y, w = 8, h = p.height, color = p.color);
 }
 
 turbo::go!({
@@ -50,20 +55,10 @@ turbo::go!({
 
     state.save();
 
-    rect!(
-        x = state.paddle1.x,
-        y = state.paddle1.y,
-        w = 8,
-        h = state.paddle1.height,
-        color = 0xffffffff
-    );
-    rect!(
-        x = state.paddle2.x,
-        y = state.paddle2.y,
-        w = 8,
-        h = state.paddle2.height,
-        color = 0xffffffff
-    );
+    let paddles = vec![state.paddle1, state.paddle2];
+    for pad in paddles.iter() {
+        render_paddle(pad.clone());
+    }
 });
 
 #[export_name = "turbo/hello"]
