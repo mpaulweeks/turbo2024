@@ -139,7 +139,11 @@ impl GameSim {
                 player.board = new_board;
                 player.hand = new_hand;
             }
-            ActionType::AttackTarget => {
+            ActionType::Targeting => {
+                player.targeting = Some(action.card_id);
+            }
+            ActionType::DeclareAttack => {
+                player.targeting = None;
                 player.attacks.push(Attack {
                     source: action.card_id,
                     target: action.enemy_card_id,
@@ -157,6 +161,20 @@ impl GameSim {
             PlayerId::P1 => self.p1 = player,
             PlayerId::P2 => self.p2 = player,
         }
+    }
+
+    pub fn check_click(&self, player_id: PlayerId) -> Option<Action> {
+        let clicker = match player_id {
+            PlayerId::P1 => self.p1.clone(),
+            PlayerId::P2 => self.p2.clone(),
+        };
+        if let Some(action) = click_action(self.clone(), self.p1.clone(), clicker.clone()) {
+            return Some(action);
+        }
+        if let Some(action) = click_action(self.clone(), self.p2.clone(), clicker.clone()) {
+            return Some(action);
+        }
+        return None;
     }
 }
 

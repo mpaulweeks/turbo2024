@@ -57,7 +57,14 @@ const POWER_HEIGHT: f32 = 20.0;
 pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
     let is_ready = punit.unit.card.card_id == READY_CARD_ID;
     let visible = visible || is_ready;
-    let highlight = if punit.unit.attacking {
+    let is_targetting = if let Some(targetter) = player.targeting {
+        targetter == punit.unit.card.card_id
+    } else {
+        false
+    };
+    let highlight = if is_targetting {
+        Some(0x00FF0080)
+    } else if punit.unit.attacking {
         Some(0xFF000080)
     } else if is_ready && player.ready {
         Some(0x00FF0080)

@@ -4,7 +4,8 @@ use crate::*;
 pub enum ActionType {
     PlayFromHand,
     Ready,
-    AttackTarget,
+    Targeting,
+    DeclareAttack,
 }
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
@@ -33,9 +34,18 @@ pub fn create_action_ready(player_id: PlayerId) -> Action {
     };
 }
 
+pub fn create_action_target(player_id: PlayerId, attacker: CardId) -> Action {
+    return Action {
+        action_type: ActionType::Targeting,
+        player_id,
+        card_id: attacker,
+        enemy_card_id: EMPTY_CARD_ID,
+    };
+}
+
 pub fn create_action_attack(player_id: PlayerId, attacker: CardId, target: CardId) -> Action {
     return Action {
-        action_type: ActionType::AttackTarget,
+        action_type: ActionType::DeclareAttack,
         player_id,
         card_id: attacker,
         enemy_card_id: target,

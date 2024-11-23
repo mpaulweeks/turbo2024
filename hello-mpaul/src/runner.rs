@@ -14,12 +14,12 @@ pub fn update() {
     if gamepad(0).a.just_pressed() {
         state.history.actions.pop();
     } else if mouse(0).left.just_pressed() {
-        if let Some(action) = click_action(logic_snapshot.p1.clone(), logic_snapshot.clone()) {
+        if let Some(action) = logic_snapshot.check_click(PlayerId::P1) {
             state.history.action_ticks = MIN_ACTION_TICKS;
             state.history.actions.push(action);
         }
     } else if mouse(0).right.just_pressed() {
-        if let Some(action) = click_action(logic_snapshot.p2.clone(), logic_snapshot.clone()) {
+        if let Some(action) = logic_snapshot.check_click(PlayerId::P2) {
             state.history.action_ticks = MIN_ACTION_TICKS;
             state.history.actions.push(action);
         }

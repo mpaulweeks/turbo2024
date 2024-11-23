@@ -19,6 +19,7 @@ pub struct PlayerState {
     pub hand: Vec<UnitCard>,
     pub deck: Vec<UnitCard>,
     pub ready: bool,
+    pub targeting: Option<CardId>,
 }
 
 pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
@@ -32,16 +33,17 @@ pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
         hand: Vec::new(),
         deck,
         ready: false,
+        targeting: None,
     };
 }
 
-pub fn position_player(p: PlayerState, game: GameSim) -> Vec<PositionedUnit> {
+pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> Vec<PositionedUnit> {
     let mut out: Vec<PositionedUnit> = Vec::new();
 
-    let ready_action = if p.ready {
-        None
-    } else {
+    let ready_action = if !p.ready && p.player_id == clicker.player_id {
         Some(create_action_ready(p.player_id.clone()))
+    } else {
+        None
     };
     out.push(PositionedUnit {
         unit: create_ready_unit(),
@@ -53,12 +55,20 @@ pub fn position_player(p: PlayerState, game: GameSim) -> Vec<PositionedUnit> {
     });
 
     for (i, c) in p.board.iter().enumerate() {
-        let can_attack = game.round_phase == RoundPhase::Plan && !c.attacking;
-        let unit_action = if can_attack {
+        let can_target = game.round_phase == RoundPhase::Plan
+            && p.player_id == clicker.player_id
+            && p.targeting.is_none()
+            && !c.attacking;
+        let can_attack = game.round_phase == RoundPhase::Plan
+            && p.player_id != clicker.player_id
+            && clicker.targeting.is_some();
+        let unit_action = if can_target {
+            Some(create_action_target(p.player_id.clone(), c.card.card_id))
+        } else if can_attack {
             Some(create_action_attack(
-                p.player_id.clone(),
+                clicker.player_id.clone(),
+                clicker.targeting.unwrap(),
                 c.card.card_id,
-                EMPTY_CARD_ID,
             ))
         } else {
             None
@@ -70,6 +80,7 @@ pub fn position_player(p: PlayerState, game: GameSim) -> Vec<PositionedUnit> {
     }
     for (i, c) in p.hand.iter().enumerate() {
         let can_play = game.round_phase == RoundPhase::Deploy
+            && p.player_id == clicker.player_id
             && impulse_check(c.clone(), game.impulse.clone());
         let unit_action = if can_play {
             Some(create_action_play_from_hand(
@@ -87,8 +98,8 @@ pub fn position_player(p: PlayerState, game: GameSim) -> Vec<PositionedUnit> {
     return out;
 }
 
-pub fn click_action(p: PlayerState, game: GameSim) -> Option<Action> {
-    let positioned = position_player(p.clone(), game);
+pub fn click_action(game: GameSim, player: PlayerState, clicker: PlayerState) -> Option<Action> {
+    let positioned = position_player(game, player.clone(), clicker);
     let hovered: Vec<&PositionedUnit> = positioned.iter().filter(|unit| unit.pos.hover).collect();
     if let Some(clicked) = hovered.first() {
         return clicked.pos.action.clone();
@@ -110,8 +121,8 @@ fn tween_player(
     percent: f32,
     game: GameSim,
 ) -> Vec<PositionedUnit> {
-    let current_cards = position_player(current, game.clone());
-    let previous_cards = units_to_map(position_player(previous, game.clone()));
+    let current_cards = position_player(game.clone(), current.clone(), current);
+    let previous_cards = units_to_map(position_player(game.clone(), previous.clone(), previous));
     return current_cards
         .iter()
         .map(|curr_unit| {
