@@ -10,6 +10,8 @@ mod impulse;
 use impulse::*;
 mod player;
 use player::*;
+mod sim;
+use sim::*;
 mod unit;
 use unit::*;
 mod util;

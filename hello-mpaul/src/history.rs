@@ -10,37 +10,34 @@ pub struct GameHistory {
 }
 
 pub fn create_game() -> GameHistory {
-    let mut starting_actions: Vec<Action> = Vec::new();
-    starting_actions.push(create_action_draw_impulse());
-    for _ in 0..5 {
-        starting_actions.push(create_action_draw_from_deck(PlayerId::P1));
-        starting_actions.push(create_action_draw_from_deck(PlayerId::P2));
-    }
     return GameHistory {
         impulse_deck: create_impulse_deck(),
         p1deck: create_deck(),
         p2deck: create_deck(),
         action_ticks: 0.0,
-        actions: starting_actions,
+        actions: Vec::new(),
     };
 }
 
 pub struct GameDelta {
-    pub current: GameSnapshot,
-    pub previous: GameSnapshot,
+    pub current: GameSim,
+    pub previous: GameSim,
 }
 
 pub fn simulate_game(game: GameHistory) -> GameDelta {
-    let mut current = GameSnapshot {
+    let mut current = GameSim {
+        round_phase: RoundPhase::Begin,
         impulse: create_impulse_state(game.impulse_deck),
         p1: create_player(PlayerId::P1, game.p1deck),
         p2: create_player(PlayerId::P2, game.p2deck),
     };
     let mut previous = current.clone();
+    current.advance();
 
     for action in game.actions.iter() {
         previous = current.clone();
-        current = apply_action(current, action.clone());
+        current.advance();
+        current.apply_action(action.clone());
     }
 
     return GameDelta { current, previous };
