@@ -22,7 +22,7 @@ pub fn create_ready_unit() -> UnitCard {
         impulse_turn: 0,
         power: 0,
         card: Card {
-            card_id: 9999,
+            card_id: READY_CARD_ID,
             sprite: "VICard_Back".to_string(),
         },
     };
@@ -53,7 +53,7 @@ const POWER_HEIGHT: f32 = 20.0;
 
 pub fn render_unit(punit: PositionedUnit, visible: bool) {
     render_card(punit.pos.clone(), punit.unit.card.sprite, visible);
-    if visible {
+    if visible && punit.unit.card.card_id != READY_CARD_ID {
         text!(
             &punit.unit.power.to_string(),
             x = -POWER_WIDTH + punit.pos.x + punit.pos.w / 2.0,

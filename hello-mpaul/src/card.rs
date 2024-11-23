@@ -1,6 +1,7 @@
 use crate::*;
 
 pub type CardId = u32;
+pub const READY_CARD_ID: CardId = 9999;
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct Card {
