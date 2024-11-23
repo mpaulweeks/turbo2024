@@ -13,6 +13,7 @@ pub struct PlayerState {
     pub player_id: PlayerId,
     row_board: u8,
     row_hand: u8,
+    pub attacks: Vec<Attack>,
     pub board: Vec<UnitCard>,
     pub hand: Vec<UnitCard>,
     pub deck: Vec<UnitCard>,
@@ -24,6 +25,7 @@ pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
         row_board: if index == PlayerId::P1 { 3 } else { 1 },
         row_hand: if index == PlayerId::P1 { 4 } else { 0 },
         player_id: index,
+        attacks: Vec::new(),
         board: Vec::new(),
         hand: Vec::new(),
         deck,
@@ -49,9 +51,19 @@ pub fn position_player(p: PlayerState, game: GameSim) -> Vec<PositionedUnit> {
     });
 
     for (i, c) in p.board.iter().enumerate() {
+        let can_attack = game.round_phase == RoundPhase::Attack && !c.attacking;
+        let unit_action = if can_attack {
+            Some(create_action_attack(
+                p.player_id.clone(),
+                c.card.card_id,
+                EMPTY_CARD_ID,
+            ))
+        } else {
+            None
+        };
         out.push(PositionedUnit {
             unit: c.clone(),
-            pos: position_card(p.row_board as f32, i as f32, None),
+            pos: position_card(p.row_board as f32, i as f32, unit_action),
         });
     }
     for (i, c) in p.hand.iter().enumerate() {

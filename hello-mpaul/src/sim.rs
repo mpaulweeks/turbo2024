@@ -116,6 +116,19 @@ impl GameSim {
                 player.board = new_board;
                 player.hand = new_hand;
             }
+            ActionType::AttackTarget => {
+                player.attacks.push(Attack {
+                    source: action.card_id,
+                    target: action.enemy_card_id,
+                });
+                for i in 1..player.board.len() {
+                    let mut unit = player.board[i].clone();
+                    if action.card_id == unit.card.card_id {
+                        unit.attacking = true;
+                        player.board[i] = unit;
+                    }
+                }
+            }
         }
         match action.player_id {
             PlayerId::P1 => self.p1 = player,

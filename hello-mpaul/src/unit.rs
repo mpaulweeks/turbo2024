@@ -7,6 +7,7 @@ pub struct UnitCard {
     pub impulse_cost: UnitCost,
     pub impulse_turn: usize,
     pub power: u32,
+    pub attacking: bool,
     pub card: Card,
 }
 
@@ -21,6 +22,7 @@ pub fn create_ready_unit() -> UnitCard {
         impulse_cost: vec![],
         impulse_turn: 0,
         power: 0,
+        attacking: false,
         card: Card {
             card_id: READY_CARD_ID,
             sprite: "VICard_Back".to_string(),
@@ -38,6 +40,7 @@ pub fn create_deck() -> Deck {
                 power: ud.power,
                 impulse_turn: ud.impulse_turn,
                 impulse_cost: ud.impulse_cost.clone(),
+                attacking: false,
                 card: Card {
                     card_id: deck.len() as u32 + 1,
                     sprite: ud.sprite.clone(),
@@ -52,7 +55,16 @@ const POWER_WIDTH: f32 = 15.0;
 const POWER_HEIGHT: f32 = 20.0;
 
 pub fn render_unit(punit: PositionedUnit, visible: bool) {
-    render_card(punit.pos.clone(), punit.unit.card.sprite, visible);
+    render_card(
+        punit.pos.clone(),
+        punit.unit.card.sprite,
+        visible,
+        if punit.unit.attacking {
+            Some(0xFF000080)
+        } else {
+            None
+        },
+    );
     if visible && punit.unit.card.card_id != READY_CARD_ID {
         text!(
             &punit.unit.power.to_string(),

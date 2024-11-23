@@ -73,7 +73,12 @@ fn position_impulse(state: ImpulseState) -> Vec<PositionedImpulse> {
 }
 pub fn render_impulse(state: ImpulseState) {
     for pimp in position_impulse(state).iter() {
-        render_card(pimp.pos.clone(), pimp.impulse.card.sprite.clone(), true);
+        render_card(
+            pimp.pos.clone(),
+            pimp.impulse.card.sprite.clone(),
+            true,
+            None,
+        );
     }
 }
 

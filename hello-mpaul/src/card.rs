@@ -1,6 +1,7 @@
 use crate::*;
 
 pub type CardId = u32;
+pub const EMPTY_CARD_ID: CardId = 9998;
 pub const READY_CARD_ID: CardId = 9999;
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
@@ -46,7 +47,7 @@ pub fn position_card(row: f32, col: f32, action: Option<Action>) -> CardPosition
     };
 }
 
-pub fn render_card(pcard: CardPosition, sprite: String, visible: bool) {
+pub fn render_card(pcard: CardPosition, sprite: String, visible: bool, highlight: Option<u32>) {
     if pcard.hover {
         let margin = pcard.w * 0.2;
         let color: u32 = if visible && pcard.action.is_some() {
@@ -75,6 +76,16 @@ pub fn render_card(pcard: CardPosition, sprite: String, visible: bool) {
         w = pcard.w,
         h = pcard.h,
     );
+    if let Some(color) = highlight {
+        rect!(
+            x = pcard.x - (pcard.w / 2.0),
+            y = pcard.y - (pcard.h / 2.0),
+            w = pcard.w,
+            h = pcard.h,
+            color = color,
+            border_radius = 10,
+        );
+    }
 }
 
 fn tween(start: f32, end: f32, percent: f32) -> f32 {
