@@ -18,7 +18,7 @@ pub struct CardPosition {
     pub action: Option<Action>,
 }
 
-pub fn position_card(row: u8, col: usize, action: Option<Action>) -> CardPosition {
+pub fn position_card(row: f32, col: f32, action: Option<Action>) -> CardPosition {
     let res = resolution();
     let screen_width = res[0] as f32;
     let screen_height = res[1] as f32;
@@ -27,8 +27,8 @@ pub fn position_card(row: u8, col: usize, action: Option<Action>) -> CardPositio
     let slot_height = screen_height / 5.0;
     let card_width = 80.0;
     let card_height = 112.0;
-    let x = (screen_width - grid_width) + slot_width * (col as f32 + 0.5);
-    let y = slot_height * (row as f32 + 0.5);
+    let x = (screen_width - grid_width) + slot_width * (col + 0.5);
+    let y = slot_height * (row + 0.5);
     let left = (x - card_width / 2.0) as i32;
     let right = (x + card_width / 2.0) as i32;
     let top = (y - card_height / 2.0) as i32;

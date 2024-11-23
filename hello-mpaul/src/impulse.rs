@@ -71,7 +71,7 @@ fn position_impulse(state: ImpulseState) -> Vec<PositionedImpulse> {
             let (index, impulse) = tuple;
             return PositionedImpulse {
                 impulse: impulse.clone(),
-                pos: position_card(2, index, None),
+                pos: position_card(2.0, index as f32, None),
             };
         })
         .collect();

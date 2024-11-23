@@ -16,6 +16,18 @@ pub struct PositionedUnit {
     pub pos: CardPosition,
 }
 
+pub fn create_ready_unit() -> UnitCard {
+    return UnitCard {
+        impulse_cost: vec![],
+        impulse_turn: 0,
+        power: 0,
+        card: Card {
+            card_id: 9999,
+            sprite: "VICard_Back".to_string(),
+        },
+    };
+}
+
 pub type Deck = Vec<UnitCard>;
 pub fn create_deck() -> Deck {
     let drafts = unique_cards();

@@ -33,15 +33,30 @@ pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
 
 pub fn position_player(p: PlayerState, game: GameSim) -> Vec<PositionedUnit> {
     let mut out: Vec<PositionedUnit> = Vec::new();
+
+    let ready_action = if p.ready {
+        None
+    } else {
+        Some(create_action_ready(p.player_id.clone()))
+    };
+    out.push(PositionedUnit {
+        unit: create_ready_unit(),
+        pos: position_card(
+            (p.row_hand as f32 + p.row_board as f32) / 2.0,
+            -1.5,
+            ready_action,
+        ),
+    });
+
     for (i, c) in p.board.iter().enumerate() {
         out.push(PositionedUnit {
             unit: c.clone(),
-            pos: position_card(p.row_board, i, None),
+            pos: position_card(p.row_board as f32, i as f32, None),
         });
     }
     for (i, c) in p.hand.iter().enumerate() {
         let can_play = impulse_check(c.clone(), game.impulse.clone());
-        let action = if can_play {
+        let unit_action = if can_play {
             Some(create_action_play_from_hand(
                 p.player_id.clone(),
                 c.card.card_id,
@@ -51,7 +66,7 @@ pub fn position_player(p: PlayerState, game: GameSim) -> Vec<PositionedUnit> {
         };
         out.push(PositionedUnit {
             unit: c.clone(),
-            pos: position_card(p.row_hand, i, action),
+            pos: position_card(p.row_hand as f32, i as f32, unit_action),
         });
     }
     return out;

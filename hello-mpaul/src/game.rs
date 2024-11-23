@@ -49,17 +49,6 @@ pub fn render() {
         color = 0x004000ff,
     );
 
-    // buttons
-    let margin = panel_width * 0.2;
-    rect!(
-        x = margin,
-        y = margin,
-        w = panel_width - margin * 2.0,
-        h = margin,
-        color = 0x000000ff,
-        border_radius = 5,
-    );
-
     render_player(
         delta.current.clone().p1,
         delta.previous.p1,
