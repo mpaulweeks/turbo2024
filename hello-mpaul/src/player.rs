@@ -51,7 +51,7 @@ pub fn position_player(p: PlayerState, game: GameSim) -> Vec<PositionedUnit> {
     });
 
     for (i, c) in p.board.iter().enumerate() {
-        let can_attack = game.round_phase == RoundPhase::Attack && !c.attacking;
+        let can_attack = game.round_phase == RoundPhase::Plan && !c.attacking;
         let unit_action = if can_attack {
             Some(create_action_attack(
                 p.player_id.clone(),

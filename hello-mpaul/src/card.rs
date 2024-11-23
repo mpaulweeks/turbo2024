@@ -53,7 +53,7 @@ pub fn render_card(pcard: CardPosition, sprite: String, visible: bool, highlight
         let color: u32 = if visible && pcard.action.is_some() {
             0x00FF00FF
         } else {
-            0xFF0000FF
+            0x8080FFFF
         };
         rect!(
             x = pcard.x - (pcard.w + margin) / 2.0,
