@@ -143,16 +143,22 @@ impl GameSim {
             .iter_mut()
             .find(|unit| unit.card.card_id == attack.target);
         if let Some(au) = attack_unit {
+            let attack_power = au.power;
             if let Some(du) = defend_unit {
-                let attack_power = au.power;
-                au.power = attack_power - du.power;
-                du.power = du.power - attack_power;
+                au.power = (attack_power - du.power).clamp(0, 99);
+                du.power = (du.power - attack_power).clamp(0, 99);
             } else {
-                defender.health -= au.power;
-                match defender.player_id {
-                    PlayerId::P1 => self.p1 = defender,
-                    PlayerId::P2 => self.p2 = defender,
-                }
+                defender.health = (defender.health - attack_power).clamp(0, 99);
+            }
+        }
+        match attacker.player_id {
+            PlayerId::P1 => {
+                self.p1 = attacker;
+                self.p2 = defender;
+            }
+            PlayerId::P2 => {
+                self.p1 = defender;
+                self.p2 = attacker;
             }
         }
     }

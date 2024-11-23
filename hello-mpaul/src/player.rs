@@ -11,7 +11,7 @@ pub enum PlayerId {
 #[derive(Clone)]
 pub struct PlayerState {
     pub player_id: PlayerId,
-    pub health: u32,
+    pub health: i32,
     row_board: u8,
     row_hand: u8,
     pub attacks: Vec<AttackState>,
@@ -39,9 +39,18 @@ pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
 
 pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> Vec<PositionedUnit> {
     let mut out: Vec<PositionedUnit> = Vec::new();
+    let clicker_can_attack = game.round_phase == RoundPhase::Plan
+        && p.player_id != clicker.player_id
+        && clicker.targeting.is_some();
 
-    let ready_action = if !p.ready && p.player_id == clicker.player_id {
+    let ready_action = if !p.ready && p.targeting.is_none() && p.player_id == clicker.player_id {
         Some(create_action_ready(p.player_id.clone()))
+    } else if clicker_can_attack {
+        Some(create_action_attack(
+            clicker.player_id.clone(),
+            clicker.targeting.unwrap(),
+            EMPTY_CARD_ID,
+        ))
     } else {
         None
     };
@@ -59,12 +68,9 @@ pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> V
             && p.player_id == clicker.player_id
             && p.targeting.is_none()
             && !c.attacking;
-        let can_attack = game.round_phase == RoundPhase::Plan
-            && p.player_id != clicker.player_id
-            && clicker.targeting.is_some();
         let unit_action = if can_target {
             Some(create_action_target(p.player_id.clone(), c.card.card_id))
-        } else if can_attack {
+        } else if clicker_can_attack {
             Some(create_action_attack(
                 clicker.player_id.clone(),
                 clicker.targeting.unwrap(),
@@ -155,8 +161,8 @@ pub fn render_player(current: PlayerState, previous: PlayerState, percent: f32, 
         &current.health.to_string(),
         x = panel_width / 2.0,
         y = match current.player_id {
-            PlayerId::P1 => screen_height * 0.35,
-            PlayerId::P2 => screen_height * 0.65,
+            PlayerId::P1 => screen_height * 0.65,
+            PlayerId::P2 => screen_height * 0.35,
         },
         font = Font::L,
     )

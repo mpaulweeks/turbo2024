@@ -6,7 +6,7 @@ type UnitCost = Vec<(ImpulseType, usize)>;
 pub struct UnitCard {
     pub impulse_cost: UnitCost,
     pub impulse_turn: usize,
-    pub power: u32,
+    pub power: i32,
     pub attacking: bool,
     pub card: Card,
 }
@@ -92,7 +92,7 @@ pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
 struct UnitDraft {
     impulse_cost: UnitCost,
     impulse_turn: usize,
-    power: u32,
+    power: i32,
     sprite: String,
 }
 
