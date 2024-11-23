@@ -73,13 +73,13 @@ pub fn apply_action(snapshot: GameSnapshot, action: Action) -> GameSnapshot {
         }
         ActionType::PlayFromHand => {
             let mut new_board = player.board.to_vec();
-            let mut new_hand: Vec<Card> = Vec::new();
-            for card in player.hand.iter() {
-                let is_hover = card.card_id == action.card_id;
+            let mut new_hand: Vec<UnitCard> = Vec::new();
+            for unit in player.hand.iter() {
+                let is_hover = unit.card.card_id == action.card_id;
                 if is_hover {
-                    new_board.push(card.clone());
+                    new_board.push(unit.clone());
                 } else {
-                    new_hand.push(card.clone());
+                    new_hand.push(unit.clone());
                 }
             }
             player.board = new_board;

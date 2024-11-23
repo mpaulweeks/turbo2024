@@ -65,6 +65,8 @@ pub fn render_impulse(state: ImpulseState) {
     }
 }
 
-pub fn impulse_check(card: Card, state: ImpulseState) -> bool {
-    return true;
+pub fn impulse_check(unit: UnitCard, state: ImpulseState) -> bool {
+    let impulse_types: Vec<ImpulseType> =
+        state.board.iter().map(|ic| ic.resource.clone()).collect();
+    return unit.impulse_turn <= impulse_types.len() && impulse_types.contains(&unit.impulse_type);
 }

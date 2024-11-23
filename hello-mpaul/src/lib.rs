@@ -2,8 +2,6 @@ mod action;
 use action::*;
 mod card;
 use card::*;
-mod deck;
-use deck::*;
 mod game;
 use game::*;
 mod history;
@@ -12,6 +10,8 @@ mod impulse;
 use impulse::*;
 mod player;
 use player::*;
+mod unit;
+use unit::*;
 
 turbo::cfg! {r#"
     name = "hello-mpaul"

@@ -13,9 +13,9 @@ pub struct PlayerState {
     pub player_id: PlayerId,
     row_board: u8,
     row_hand: u8,
-    pub board: Vec<Card>,
-    pub hand: Vec<Card>,
-    pub deck: Vec<Card>,
+    pub board: Vec<UnitCard>,
+    pub hand: Vec<UnitCard>,
+    pub deck: Vec<UnitCard>,
 }
 
 pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
@@ -32,16 +32,16 @@ pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
 pub fn position_player(p: PlayerState, game: GameSnapshot) -> Vec<PositionedCard> {
     let mut out: Vec<PositionedCard> = Vec::new();
     for (i, c) in p.board.iter().enumerate() {
-        out.push(position_card(c.clone(), p.row_board, i, None));
+        out.push(position_card(c.card.clone(), p.row_board, i, None));
     }
     for (i, c) in p.hand.iter().enumerate() {
         let can_play = impulse_check(c.clone(), game.impulse.clone());
         let action = if can_play {
-            Some(action_play_from_hand(p.player_id.clone(), c.card_id))
+            Some(action_play_from_hand(p.player_id.clone(), c.card.card_id))
         } else {
             None
         };
-        out.push(position_card(c.clone(), p.row_hand, i, action));
+        out.push(position_card(c.card.clone(), p.row_hand, i, action));
     }
     return out;
 }
