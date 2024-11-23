@@ -34,7 +34,7 @@ pub fn position_player(p: PlayerState, game: GameSnapshot) -> Vec<PositionedUnit
     for (i, c) in p.board.iter().enumerate() {
         out.push(PositionedUnit {
             unit: c.clone(),
-            pcard: position_card(c.card.clone(), p.row_board, i, None),
+            pos: position_card(p.row_board, i, None),
         });
     }
     for (i, c) in p.hand.iter().enumerate() {
@@ -49,7 +49,7 @@ pub fn position_player(p: PlayerState, game: GameSnapshot) -> Vec<PositionedUnit
         };
         out.push(PositionedUnit {
             unit: c.clone(),
-            pcard: position_card(c.card.clone(), p.row_hand, i, action),
+            pos: position_card(p.row_hand, i, action),
         });
     }
     return out;
@@ -57,9 +57,9 @@ pub fn position_player(p: PlayerState, game: GameSnapshot) -> Vec<PositionedUnit
 
 pub fn click_action(p: PlayerState, game: GameSnapshot) -> Option<Action> {
     let positioned = position_player(p.clone(), game);
-    let hovered: Vec<&PositionedUnit> = positioned.iter().filter(|unit| unit.pcard.hover).collect();
+    let hovered: Vec<&PositionedUnit> = positioned.iter().filter(|unit| unit.pos.hover).collect();
     if let Some(clicked) = hovered.first() {
-        return clicked.pcard.action.clone();
+        return clicked.pos.action.clone();
     } else {
         return None;
     }
@@ -86,7 +86,7 @@ fn tween_player(
             if let Some(prev_unit) = previous_cards.get(&curr_unit.unit.card.card_id) {
                 return PositionedUnit {
                     unit: curr_unit.unit.clone(),
-                    pcard: tween_card(curr_unit.pcard.clone(), prev_unit.pcard.clone(), percent),
+                    pos: tween_card(curr_unit.pos.clone(), prev_unit.pos.clone(), percent),
                 };
             } else {
                 return curr_unit.clone();

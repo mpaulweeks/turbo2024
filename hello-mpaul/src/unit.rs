@@ -13,7 +13,7 @@ pub struct UnitCard {
 #[derive(Clone)]
 pub struct PositionedUnit {
     pub unit: UnitCard,
-    pub pcard: PositionedCard,
+    pub pos: CardPosition,
 }
 
 pub type Deck = Vec<UnitCard>;
@@ -40,12 +40,12 @@ const POWER_WIDTH: f32 = 15.0;
 const POWER_HEIGHT: f32 = 20.0;
 
 pub fn render_unit(punit: PositionedUnit, visible: bool) {
-    render_card(punit.pcard.clone(), visible);
+    render_card(punit.pos.clone(), punit.unit.card.sprite, visible);
     if visible {
         text!(
             &punit.unit.power.to_string(),
-            x = -POWER_WIDTH + punit.pcard.x + punit.pcard.w / 2.0,
-            y = -POWER_HEIGHT + punit.pcard.y + punit.pcard.h / 2.0,
+            x = -POWER_WIDTH + punit.pos.x + punit.pos.w / 2.0,
+            y = -POWER_HEIGHT + punit.pos.y + punit.pos.h / 2.0,
             color = 0xffffffff,
             font = Font::L,
         );

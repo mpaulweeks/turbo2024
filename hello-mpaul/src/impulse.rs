@@ -57,10 +57,28 @@ pub fn create_impulse_state(deck: Vec<ImpulseCard>) -> ImpulseState {
     };
 }
 
+struct PositionedImpulse {
+    impulse: ImpulseCard,
+    pos: CardPosition,
+}
+
+fn position_impulse(state: ImpulseState) -> Vec<PositionedImpulse> {
+    return state
+        .board
+        .iter()
+        .enumerate()
+        .map(|tuple| {
+            let (index, impulse) = tuple;
+            return PositionedImpulse {
+                impulse: impulse.clone(),
+                pos: position_card(2, index, None),
+            };
+        })
+        .collect();
+}
 pub fn render_impulse(state: ImpulseState) {
-    for (index, impulse) in state.board.iter().enumerate() {
-        let pcard = position_card(impulse.card.clone(), 2, index, None);
-        render_card(pcard, true);
+    for pimp in position_impulse(state).iter() {
+        render_card(pimp.pos.clone(), pimp.impulse.card.sprite.clone(), true);
     }
 }
 
