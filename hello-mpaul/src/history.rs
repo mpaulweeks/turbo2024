@@ -12,7 +12,7 @@ pub struct GameHistory {
 pub fn create_game() -> GameHistory {
     let mut starting_actions: Vec<Action> = Vec::new();
     starting_actions.push(create_action_draw_impulse());
-    for _ in 0..4 {
+    for _ in 0..5 {
         starting_actions.push(create_action_draw_from_deck(PlayerId::P1));
         starting_actions.push(create_action_draw_from_deck(PlayerId::P2));
     }
