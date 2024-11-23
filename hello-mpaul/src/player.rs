@@ -1,3 +1,5 @@
+use std::collections::BTreeMap;
+
 use crate::*;
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
@@ -16,11 +18,6 @@ pub struct Player {
     pub deck: Vec<Card>,
 }
 
-pub struct PositionedPlayer {
-    phand: Vec<PositionedCard>,
-    pboard: Vec<PositionedCard>,
-}
-
 pub fn create_player(index: PlayerId, deck: Deck) -> Player {
     return Player {
         row_board: if index == PlayerId::P1 { 2 } else { 1 },
@@ -32,39 +29,57 @@ pub fn create_player(index: PlayerId, deck: Deck) -> Player {
     };
 }
 
-pub fn position_player(p: Player) -> PositionedPlayer {
-    let mut pboard: Vec<PositionedCard> = Vec::new();
-    let mut phand: Vec<PositionedCard> = Vec::new();
+pub fn position_player(p: Player) -> Vec<PositionedCard> {
+    let mut out: Vec<PositionedCard> = Vec::new();
     for (i, c) in p.board.iter().enumerate() {
-        pboard.push(position_card(c.clone(), p.row_board, i));
+        out.push(position_card(c.clone(), p.row_board, i));
     }
     for (i, c) in p.hand.iter().enumerate() {
-        phand.push(position_card(c.clone(), p.row_hand, i));
+        out.push(position_card(c.clone(), p.row_hand, i));
     }
-    return PositionedPlayer { pboard, phand };
+    return out;
 }
 
 pub fn click_action(p: Player) -> Option<Action> {
     let positioned = position_player(p.clone());
     let hovered: Vec<CardId> = positioned
-        .phand
         .iter()
         .filter(|pcard| pcard.hover)
         .map(|pcard| pcard.card.card_id)
         .collect();
     if let Some(clicked) = hovered.first() {
+        // todo verify it was in hand
         return Some(action_play_from_hand(p.player_id, *clicked));
     } else {
         return None;
     }
 }
 
-pub fn render_player(p: Player) {
-    let positioned = position_player(p.clone());
-    for pcard in positioned.phand.iter() {
-        render_card(pcard.clone(), p.player_id == PlayerId::P1);
-    }
-    for pcard in positioned.pboard.iter() {
-        render_card(pcard.clone(), p.player_id == PlayerId::P1);
+fn cards_to_map(cards: Vec<PositionedCard>) -> BTreeMap<CardId, PositionedCard> {
+    return cards
+        .into_iter()
+        .map(|x| (x.card.card_id.clone(), x))
+        .collect::<BTreeMap<_, _>>();
+}
+
+fn tween_player(current: Player, previous: Player, percent: f32) -> Vec<PositionedCard> {
+    let current_cards = position_player(current);
+    let previous_cards = cards_to_map(position_player(previous));
+    return current_cards
+        .iter()
+        .map(|current_card| {
+            if let Some(p_card) = previous_cards.get(&current_card.card.card_id) {
+                return tween_card(current_card.clone(), p_card.clone(), percent);
+            } else {
+                return current_card.clone();
+            }
+        })
+        .collect();
+}
+
+pub fn render_player(current: Player, previous: Player, percent: f32) {
+    let positioned = tween_player(current.clone(), previous, percent);
+    for pcard in positioned.iter() {
+        render_card(pcard.clone(), current.player_id == PlayerId::P1);
     }
 }

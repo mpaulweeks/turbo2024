@@ -69,3 +69,22 @@ pub fn render_card(pcard: PositionedCard, visible: bool) {
         h = pcard.h,
     );
 }
+
+fn tween(start: f32, end: f32, percent: f32) -> f32 {
+    return start + (end - start) * percent;
+}
+
+pub fn tween_card(
+    current: PositionedCard,
+    previous: PositionedCard,
+    percent: f32,
+) -> PositionedCard {
+    return PositionedCard {
+        x: tween(previous.x, current.x, percent),
+        y: tween(previous.y, current.y, percent),
+        w: tween(previous.w, current.w, percent),
+        h: tween(previous.h, current.h, percent),
+        hover: current.hover,
+        card: current.card,
+    };
+}

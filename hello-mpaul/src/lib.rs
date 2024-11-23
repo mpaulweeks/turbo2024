@@ -40,6 +40,7 @@ turbo::go!({
     state.history.action_time =
         (state.history.action_time + 1.0).clamp(MIN_ACTION_TIME, MAX_ACTION_TIME);
 
+    // todo prevent actions while waiting for animation?
     if gamepad(0).a.just_pressed() {
         state.history.actions.pop();
     } else if mouse(0).left.just_pressed() {
@@ -54,12 +55,8 @@ turbo::go!({
     // render
     let action_progress = (state.history.action_time - MIN_ACTION_TIME) / MAX_ACTION_TIME;
     let delta = simulate_game(state.history.clone());
-
-    // todo render tween from prev to curr
-    let players = vec![delta.current.p1, delta.current.p2];
-    for p in players.iter() {
-        render_player(p.clone());
-    }
+    render_player(delta.current.p1, delta.previous.p1, action_progress);
+    render_player(delta.current.p2, delta.previous.p2, action_progress);
 });
 
 #[export_name = "turbo/hello"]
