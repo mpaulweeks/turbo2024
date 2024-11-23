@@ -43,8 +43,8 @@ turbo::go!({
 
     let players = vec![state.p1, state.p2];
     for p in players.iter() {
-        for (i, c) in p.deck.iter().enumerate() {
-            render_card(c.clone(), p.index, i);
+        for (i, c) in p.hand.iter().enumerate() {
+            render_card(c.clone(), p.index, i, p.index == 0);
         }
     }
 });

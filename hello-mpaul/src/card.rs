@@ -11,12 +11,27 @@ pub fn create_deck() -> Vec<Card> {
             sprite: "VICardForward_Front".to_string(),
         },
         Card {
-            sprite: "VICard_Back".to_string(),
+            sprite: "VICardForward_Front".to_string(),
+        },
+        Card {
+            sprite: "VICardForward_Front".to_string(),
+        },
+        Card {
+            sprite: "VICardForward_Front".to_string(),
+        },
+        Card {
+            sprite: "VICardForward_Front".to_string(),
+        },
+        Card {
+            sprite: "VICardForward_Front".to_string(),
+        },
+        Card {
+            sprite: "VICardForward_Front".to_string(),
         },
     ];
 }
 
-pub fn render_card(p: Card, player: u8, slot: usize) {
+pub fn render_card(p: Card, player: u8, slot: usize, visible: bool) {
     let res = resolution();
     let screen_width = res[0] as f32;
     let screen_height = res[1] as f32;
@@ -33,5 +48,10 @@ pub fn render_card(p: Card, player: u8, slot: usize) {
         h = card_height,
         color = 0xffffff80
     );
-    sprite!(&p.sprite, x = x, y = y, w = card_width, h = card_height);
+    let sprite_name = if visible {
+        p.sprite
+    } else {
+        "VICard_Back".to_string()
+    };
+    sprite!(&sprite_name, x = x, y = y, w = card_width, h = card_height);
 }
