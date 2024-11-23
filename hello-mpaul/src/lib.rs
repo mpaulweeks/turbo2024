@@ -30,14 +30,21 @@ turbo::init! {
   }
 }
 
+const MIN_ACTION_TIME: f32 = 0.0;
+const MAX_ACTION_TIME: f32 = 180.0;
+
 turbo::go!({
     let mut state = GameState::load();
-    let logic_snapshot = simulate_game(state.history.clone());
+    let logic_snapshot = simulate_game(state.history.clone()).current;
+    // todo delta time?
+    state.history.actionTime =
+        (state.history.actionTime + 1.0).clamp(MIN_ACTION_TIME, MAX_ACTION_TIME);
 
     if gamepad(0).a.just_pressed() {
         state.history.actions.pop();
     } else if mouse(0).left.just_pressed() {
         if let Some(action) = click_action(logic_snapshot.p1) {
+            state.history.actionTime = MIN_ACTION_TIME;
             state.history.actions.push(action);
         }
     }
@@ -45,8 +52,11 @@ turbo::go!({
     state.save();
 
     // render
-    let render_snapshot = simulate_game(state.history.clone());
-    let players = vec![render_snapshot.p1, render_snapshot.p2];
+    let action_progress = (state.history.actionTime - MIN_ACTION_TIME) / MAX_ACTION_TIME;
+    let delta = simulate_game(state.history.clone());
+
+    // todo render tween from prev to curr
+    let players = vec![delta.current.p1, delta.current.p2];
     for p in players.iter() {
         render_player(p.clone());
     }
