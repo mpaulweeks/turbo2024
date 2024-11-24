@@ -190,12 +190,23 @@ impl PlayerState {
         let screen_height = res[1] as f32;
         let grid_width = screen_width * 0.8;
         let panel_width = screen_width - grid_width;
+        let active_player = if game.impulse.board.len() % 2 == 0 {
+            PlayerId::P2
+        } else {
+            PlayerId::P1
+        };
+        let active_star = (if active_player == self.player_id {
+            "*"
+        } else {
+            ""
+        })
+        .to_string();
         let pid = match self.player_id {
             PlayerId::P1 => "P1",
             PlayerId::P2 => "P2",
         };
         text!(
-            &(pid.to_string() + " " + &self.health.to_string()),
+            &(active_star + " " + pid + " " + &self.health.to_string()),
             x = panel_width / 2.0,
             y = screen_height * self.row_health / 5.0,
             font = Font::L,
