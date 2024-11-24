@@ -3,7 +3,7 @@ use crate::*;
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct GameHistory {
     impulse_deck: Vec<ImpulseCard>,
-    local: Option<PlayerId>,
+    pub local: Option<PlayerId>,
     p1deck: Deck,
     p2deck: Deck,
     pub action_ticks: f32,

@@ -6,6 +6,7 @@ const MAX_ACTION_TICKS: f32 = 60.0;
 pub fn update() {
     let mut state = GameState::load();
     let logic_snapshot = simulate_game(state.history.clone()).current;
+    let local = state.history.local.clone();
 
     state.history.action_ticks =
         (state.history.action_ticks + 1.0).clamp(MIN_ACTION_TICKS, MAX_ACTION_TICKS);
@@ -14,11 +15,16 @@ pub fn update() {
     if gamepad(0).a.just_pressed() {
         state.history.actions.pop();
     } else if mouse(0).left.just_pressed() {
-        if let Some(action) = logic_snapshot.check_click(PlayerId::P1) {
+        let clicker = match local {
+            None => PlayerId::P1,
+            Some(PlayerId::P1) => PlayerId::P1,
+            Some(PlayerId::P2) => PlayerId::P2,
+        };
+        if let Some(action) = logic_snapshot.check_click(clicker) {
             state.history.action_ticks = MIN_ACTION_TICKS;
             state.history.actions.push(action);
         }
-    } else if mouse(0).right.just_pressed() {
+    } else if mouse(0).right.just_pressed() && local.is_none() {
         if let Some(action) = logic_snapshot.check_click(PlayerId::P2) {
             state.history.action_ticks = MIN_ACTION_TICKS;
             state.history.actions.push(action);
