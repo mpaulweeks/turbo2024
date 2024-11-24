@@ -13,8 +13,10 @@ const BUTTON_TEXT_COLOR: u32 = 0xF0F8FFff;
 const MATCHMAKING_FILE: &str = "matchmaker";
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
-pub struct MainMenuState {
-    pub searching_for_match: bool,
+pub enum MainMenuState {
+    TitleScreen,
+    WaitingForMatch,
+    WaitingForRands,
 }
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
@@ -40,14 +42,13 @@ impl MatchInfo {
 
 pub fn main_menu_go(state: &mut GameState)
 {
-    if !state.main_menue_state.searching_for_match {
-        title_screen_go(state);
-    } else {
-        finding_opponent_go(state);
+    match state.main_menue_state {
+        MainMenuState::TitleScreen => {title_screen_go(state)}
+        MainMenuState::WaitingForMatch => {finding_opponent_go(state)}
+        MainMenuState::WaitingForRands => { wait_for_rands(state)}
     }
+
 }
-
-
 
 fn finding_opponent_go(state: &mut GameState) {
     draw_logo();
@@ -88,11 +89,21 @@ fn finding_opponent_go(state: &mut GameState) {
 
     let user_id = os::client::user_id();
     if let Some(ref id) = user_id {
-        if state.match_info.match_started &&
-            (state.match_info.inviter_user == id.to_string() || state.match_info.joining_user == id.to_string())
+        if state.match_info.match_started
         {
-            state.game_mode = GameMode::PlayingMatch;
+            if state.match_info.joining_user == id.to_string()
+            {
+                //tell server to create rands
+                let bytes = state.match_info.match_id.to_le_bytes();
+                os::client::exec(PROGRAM_ID, "initialize_rands", &bytes);
+                state.main_menue_state = MainMenuState::WaitingForRands;
+            }
+            else if state.match_info.inviter_user == id.to_string()
+            {
+                state.main_menue_state = MainMenuState::WaitingForRands;
+            }
         }
+
     }
 }
 
@@ -151,7 +162,7 @@ unsafe extern "C" fn on_try_find_match() -> usize {
         };
     }
 
-    return os::server::COMMIT;
+    os::server::COMMIT
 }
 
 fn draw_logo(){
@@ -161,10 +172,6 @@ fn draw_logo(){
         y = 100);
 }
 
-fn draw_find_match_button(){
-    let (w, h) = (30, 20);
-    let (x, y) = (20, 180);
-}
 
 fn title_screen_go(state: &mut GameState){
     draw_logo();
@@ -185,9 +192,29 @@ fn title_screen_go(state: &mut GameState){
     let m = mouse(0);
 
     if m.left.just_pressed() && button_contains_pos(m.position[0], m.position[1], w, h, x, y) {
-        state.main_menue_state.searching_for_match = true;
+        state.main_menue_state = MainMenuState::WaitingForMatch;
     }
 
+}
+
+fn wait_for_rands(state: &mut GameState) {
+    draw_logo();
+    text!(
+        "Starting match!",
+        x = 235,
+        y = 365,
+        font = Font::XL,
+        color = BUTTON_TEXT_COLOR
+    );
+
+    let rands= os::client::watch_file(PROGRAM_ID, &format!("{}/rands",state.match_info.match_id))
+        .data
+        .and_then(|file| Rands::try_from_slice(&file.contents).ok());
+
+    if let Some(mut r) = rands {
+        state.history = create_game(&mut r);
+        state.game_mode = GameMode::PlayingMatch;
+    }
 }
 
 fn draw_button(w: i32, h: i32, x: i32, y: i32) {
@@ -203,4 +230,22 @@ fn draw_button(w: i32, h: i32, x: i32, y: i32) {
 
 fn button_contains_pos(px: i32, py: i32, w: i32, h: i32, x: i32, y: i32) -> bool {
     px >= x && px <= x + w && py >= y && py <= y + h
+}
+
+
+#[export_name = "turbo/initialize_rands"]
+unsafe extern "C" fn on_initialize_rands() -> usize {
+    let mut server_rands = Rands::new();
+
+    for _ in 1..100{
+        server_rands.push(os::server::random_number());
+    }
+
+    let match_id=os::server::command!(u32);
+
+    let Ok(_) = os::server::write!(&format!("{}/rands",match_id), server_rands) else {
+        return os::server::CANCEL;
+    };
+
+    os::server::COMMIT
 }
