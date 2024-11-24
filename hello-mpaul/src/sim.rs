@@ -58,7 +58,6 @@ impl GameSim {
         for unit in player.board.iter() {
             let mut new_unit = unit.clone();
             new_unit.attacking = false;
-            new_unit.revealed = true;
             if (new_unit.power > 0) {
                 new_board.push(new_unit);
             }
@@ -107,6 +106,8 @@ impl GameSim {
                     self.round_phase = RoundPhase::PreAttack;
                     self.p1.ready = false;
                     self.p2.ready = false;
+                    self.p1.show_board();
+                    self.p2.show_board();
                 }
             }
             RoundPhase::PreAttack => {

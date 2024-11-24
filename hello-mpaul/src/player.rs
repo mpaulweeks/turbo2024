@@ -195,6 +195,11 @@ fn tween_player(
 }
 
 impl PlayerState {
+    pub fn show_board(&mut self) {
+        for unit in self.board.iter_mut() {
+            unit.revealed = true;
+        }
+    }
     pub fn render_player(
         &self,
         previous: PlayerState,
