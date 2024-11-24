@@ -1,4 +1,5 @@
 use crate::*;
+use crate::server_comm::*;
 
 const MIN_ACTION_TICKS: f32 = 0.0;
 const MAX_ACTION_TICKS: f32 = 60.0;
@@ -21,14 +22,16 @@ pub fn update(state: &mut GameState) {
         };
         if let Some(action) = logic_snapshot.check_click(clicker) {
             state.history.action_ticks = MIN_ACTION_TICKS;
-            state.history.actions.push(action);
+            server_play_move(state, action);
         }
     } else if mouse(0).right.just_pressed() && local.is_none() {
         if let Some(action) = logic_snapshot.check_click(PlayerId::P2) {
             state.history.action_ticks = MIN_ACTION_TICKS;
-            state.history.actions.push(action);
+            server_play_move(state, action);
         }
     }
+
+    server_refresh_action_history(state);
 
     // log!("DEBUG: {:?}", state.history.actions);
     // os::server::log!()
