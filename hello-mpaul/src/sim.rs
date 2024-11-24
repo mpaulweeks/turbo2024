@@ -1,5 +1,3 @@
-use std::char::MAX;
-
 use crate::*;
 
 #[derive(PartialEq, Clone)]
@@ -111,7 +109,7 @@ impl GameSim {
                 }
             }
             RoundPhase::PreAttack => {
-                if self.action_ticks == MAX_ACTION_TICKS {
+                if self.action_ticks >= MAX_ACTION_TICKS * 3.0 {
                     self.round_phase = RoundPhase::PostAttack;
                 }
             }

@@ -1,7 +1,7 @@
 use crate::*;
 
 pub const MIN_ACTION_TICKS: f32 = 0.0;
-pub const MAX_ACTION_TICKS: f32 = 60.0;
+pub const MAX_ACTION_TICKS: f32 = 30.0;
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct GameHistory {

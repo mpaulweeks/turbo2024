@@ -3,13 +3,12 @@ use crate::*;
 
 pub fn update(state: &mut GameState) {
     if state.history.actions.len() as i32 > state.history.action_index
-        && state.history.action_ticks == MAX_ACTION_TICKS
+        && state.history.action_ticks >= MAX_ACTION_TICKS
     {
         state.history.action_index += 1;
         state.history.action_ticks = MIN_ACTION_TICKS;
     }
-    state.history.action_ticks =
-        (state.history.action_ticks + 1.0).clamp(MIN_ACTION_TICKS, MAX_ACTION_TICKS);
+    state.history.action_ticks = (state.history.action_ticks + 1.0).clamp(-9999.0, 9999.0);
 
     let logic_snapshot = simulate_game(state.history.clone()).current;
     let local = state.history.local.clone();
