@@ -98,7 +98,7 @@ pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
         false
     };
     let rimlight = if punit.unit.revealed {
-        Some(0x00FFFF80)
+        Some(0xFFFFFFFF)
     } else {
         None
     };
@@ -111,13 +111,9 @@ pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
     } else {
         None
     };
-    render_card(
-        punit.pos.clone(),
-        punit.unit.card.sprite,
-        visible,
-        rimlight,
-        highlight,
-    );
+    punit
+        .pos
+        .render_card(punit.unit.card.sprite, visible, rimlight, highlight);
     if visible && !is_ready {
         // draw unit details
         sprite!(

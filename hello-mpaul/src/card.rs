@@ -47,54 +47,56 @@ pub fn position_card(row: f32, col: f32, action: Option<Action>) -> CardPosition
     };
 }
 
-pub fn render_card(
-    pcard: CardPosition,
-    sprite: String,
-    visible: bool,
-    rimlight: Option<u32>,
-    highlight: Option<u32>,
-) {
-    let maybe_rim: Option<u32> = if pcard.hover {
-        if visible && pcard.action.is_some() {
-            Some(0x00FF00FF)
+impl CardPosition {
+    pub fn render_card(
+        &self,
+        sprite: String,
+        visible: bool,
+        rimlight: Option<u32>,
+        highlight: Option<u32>,
+    ) {
+        let maybe_rim: Option<u32> = if self.hover {
+            if visible && self.action.is_some() {
+                Some(0x00FF00FF)
+            } else {
+                Some(0x8080FFFF)
+            }
         } else {
-            Some(0x8080FFFF)
+            rimlight
+        };
+        if let Some(color) = maybe_rim {
+            let margin = self.w * 0.2;
+            rect!(
+                x = self.x - (self.w + margin) / 2.0,
+                y = self.y - (self.h + margin) / 2.0,
+                w = self.w + margin,
+                h = self.h + margin,
+                color = color,
+                border_radius = 10,
+            );
         }
-    } else {
-        rimlight
-    };
-    if let Some(color) = maybe_rim {
-        let margin = pcard.w * 0.2;
-        rect!(
-            x = pcard.x - (pcard.w + margin) / 2.0,
-            y = pcard.y - (pcard.h + margin) / 2.0,
-            w = pcard.w + margin,
-            h = pcard.h + margin,
-            color = color,
-            border_radius = 10,
+        let sprite_name = if visible {
+            sprite
+        } else {
+            "VICard_Back".to_string()
+        };
+        sprite!(
+            &sprite_name,
+            x = self.x - (self.w / 2.0),
+            y = self.y - (self.h / 2.0),
+            w = self.w,
+            h = self.h,
         );
-    }
-    let sprite_name = if visible {
-        sprite
-    } else {
-        "VICard_Back".to_string()
-    };
-    sprite!(
-        &sprite_name,
-        x = pcard.x - (pcard.w / 2.0),
-        y = pcard.y - (pcard.h / 2.0),
-        w = pcard.w,
-        h = pcard.h,
-    );
-    if let Some(color) = highlight {
-        rect!(
-            x = pcard.x - (pcard.w / 2.0),
-            y = pcard.y - (pcard.h / 2.0),
-            w = pcard.w,
-            h = pcard.h,
-            color = color,
-            border_radius = 10,
-        );
+        if let Some(color) = highlight {
+            rect!(
+                x = self.x - (self.w / 2.0),
+                y = self.y - (self.h / 2.0),
+                w = self.w,
+                h = self.h,
+                color = color,
+                border_radius = 10,
+            );
+        }
     }
 }
 
