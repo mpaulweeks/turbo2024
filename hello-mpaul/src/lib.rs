@@ -19,6 +19,9 @@ use ui::*;
 mod unit;
 use unit::*;
 mod util;
+mod main_menu;
+use main_menu::*;
+
 use util::*;
 
 turbo::cfg! {r#"
@@ -34,17 +37,39 @@ turbo::cfg! {r#"
 
 turbo::init! {
   struct GameState {
-    history: GameHistory,
+        history: GameHistory,
+        main_menue_state: MainMenuState,
+        match_info: MatchInfo,
+        game_mode: enum GameMode{
+            MainMenu,
+            PlayingMatch
+        },
+        testing: bool,
   } = {
     Self {
-      history: create_game(),
-    }
+            history: create_game(),
+            main_menue_state: MainMenuState { searching_for_match:false,},
+            match_info: MatchInfo::new(),
+            game_mode: GameMode::MainMenu,
+            testing: false,
+        }
   }
 }
 
 turbo::go!({
-    update();
-    render();
+    let mut state = GameState::load();
+
+    match state.game_mode {
+        GameMode::MainMenu =>{
+            main_menu_go(&mut state);
+        },
+        GameMode::PlayingMatch => {
+            update();
+            render();
+        }
+    }
+
+    state.save();
 });
 
 #[export_name = "turbo/hello"]
