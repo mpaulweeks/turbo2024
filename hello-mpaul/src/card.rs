@@ -20,23 +20,72 @@ pub struct CardPosition {
     pub action: Option<Action>,
 }
 
+
+pub fn render_background(){
+    let res = resolution();
+    let screen_width = res[0] as f32;
+    let screen_height = res[1] as f32;
+    let grid_width = screen_width * 0.9;
+    let slot_width = grid_width / 8.0;
+    let slot_height = screen_height / 5.0;
+
+    let mut n = 7;
+
+    sprite!{
+        "TIME_TILE",
+        x = -7.0 + (screen_width - grid_width) + slot_width,
+        y = slot_height * 2.0,
+        
+    }
+
+    while n > 0 {
+        sprite!("Card_Place_Tile",
+            x = -4.0 + (screen_width - grid_width) + slot_width * (n)as f32,
+            y = slot_height * 1.0,
+            flip_y = true,
+        );
+        sprite!("Card_Place_Tile",
+            x = -4.0 + (screen_width - grid_width) + slot_width * n as f32,
+            y = slot_height * 3.0,
+        );
+        n -= 1;
+    }
+}
+
 pub fn position_card(row: f32, col: f32, action: Option<Action>) -> CardPosition {
     let res = resolution();
     let screen_width = res[0] as f32;
     let screen_height = res[1] as f32;
-    let grid_width = screen_width * 0.8;
+    let grid_width = screen_width * 0.9;
     let slot_width = grid_width / 8.0;
     let slot_height = screen_height / 5.0;
     let card_width = 80.0;
     let card_height = 112.0;
-    let x = (screen_width - grid_width) + slot_width * (col + 0.5);
-    let y = slot_height * (row + 0.5);
+    let mut h = 0;
+
+   
+
+    let mut x = -5.0 + (screen_width - grid_width) + slot_width * (col + 1.5);
+    let mut y = slot_height * (row + 0.5);
+
+    if row == 4.0{
+        y += 60.0;
+        h = -40;
+       // x -= 30.0;
+    }
     let left = (x - card_width / 2.0) as i32;
     let right = (x + card_width / 2.0) as i32;
-    let top = (y - card_height / 2.0) as i32;
+    let top = h + (y - card_height / 2.0) as i32;
     let bottom = (y + card_height / 2.0) as i32;
     let [mx, my] = mouse(0).position;
     let hover = mx > left && mx < right && my > top && my < bottom;
+    if hover && row >= 1.0{
+
+        y-= 10.0;
+        if row == 4.0{
+            y -= 50.0;
+        }
+    }
     return CardPosition {
         x,
         y,
@@ -123,7 +172,7 @@ impl CardPosition {
                 start = (self.x, self.y),
                 end = (mx, my),
                 width = 2,
-                color = 0xff00ffff,
+                color = 0xe64539ff,
             );
         }
     }
@@ -135,7 +184,7 @@ fn tween(start: f32, end: f32, percent: f32) -> f32 {
 
 pub fn tween_card(current: CardPosition, previous: CardPosition, percent: f32) -> CardPosition {
     // https://stackoverflow.com/a/25730573
-    let ease = percent * percent * (3.0 - 2.0 * percent);
+    let ease = percent * percent * (5.0 - 4.0 * percent);
     return CardPosition {
         x: tween(previous.x, current.x, ease),
         y: tween(previous.y, current.y, ease),

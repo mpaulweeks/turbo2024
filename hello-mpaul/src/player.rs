@@ -190,15 +190,29 @@ impl PlayerState {
         let screen_height = res[1] as f32;
         let grid_width = screen_width * 0.8;
         let panel_width = screen_width - grid_width;
+        let mut col:u32 = 0xffffffff;
         let pid = match self.player_id {
             PlayerId::P1 => "P1",
             PlayerId::P2 => "P2",
         };
+
+        if self.health < 10 {
+            col = 0xe64539ff;
+        }
+
         text!(
-            &(pid.to_string() + " " + &self.health.to_string()),
-            x = panel_width / 2.0,
+            &(pid.to_string() + " HEALTH: "),
+            x = (panel_width / 2.0)-50.0,
             y = screen_height * self.row_health / 5.0,
             font = Font::L,
+        );
+        
+        text!(
+            &(&self.health.to_string()),
+            x = (panel_width / 2.0)+35.0,
+            y = (screen_height * self.row_health / 5.0) + 0.0,
+            font = Font::L,
+            color = col,
         );
 
         return positioned;

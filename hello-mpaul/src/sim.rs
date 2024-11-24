@@ -232,10 +232,10 @@ impl GameSim {
 pub fn render_round(state: GameSim) {
     let message = match state.round_phase {
         RoundPhase::Begin => "Begin",
-        RoundPhase::Draw => "Draw",
-        RoundPhase::Deploy => "Deploy",
-        RoundPhase::Plan => "Plan",
-        RoundPhase::Attack => "Attack",
+        RoundPhase::Draw => "Draw Phase",
+        RoundPhase::Deploy => "Deploy Phase",
+        RoundPhase::Plan => "Planing Phase",
+        RoundPhase::Attack => "Attack Phase",
     };
     let res = resolution();
     let screen_width = res[0] as f32;
