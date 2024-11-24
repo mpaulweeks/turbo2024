@@ -50,7 +50,7 @@ turbo::init! {
   } = {
     Self {
             history: create_game(&mut Vec::new()),
-            main_menue_state: MainMenuState { searching_for_match:false,},
+            main_menue_state: MainMenuState::TitleScreen,
             match_info: MatchInfo::new(),
             game_mode: GameMode::MainMenu,
             testing: false,
