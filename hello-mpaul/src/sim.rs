@@ -70,12 +70,6 @@ impl GameSim {
         let start_phase = self.round_phase.clone();
         match start_phase {
             RoundPhase::Begin => {
-                // todo test
-                self.draw_impulse();
-                self.draw_impulse();
-                self.draw_impulse();
-                self.draw_impulse();
-                self.draw_impulse();
                 for _ in 0..3 {
                     self.draw_player(PlayerId::P1);
                     self.draw_player(PlayerId::P2);
@@ -111,7 +105,7 @@ impl GameSim {
                 }
             }
             RoundPhase::PreAttack => {
-                if self.action_ticks >= MAX_ACTION_TICKS {
+                if self.action_ticks >= 0.0 {
                     self.round_phase = RoundPhase::PostAttack;
                     self.p1.animating_attack = false;
                     self.p2.animating_attack = false;
@@ -178,8 +172,12 @@ impl GameSim {
         if let Some(au) = attack_unit {
             let attack_power = au.power;
             if let Some(du) = defend_unit {
-                au.power = (attack_power - du.power).clamp(0, 99);
-                du.power = (du.power - attack_power).clamp(0, 99);
+                if du.power > 0 {
+                    au.power = (attack_power - du.power).clamp(0, 99);
+                    du.power = (du.power - attack_power).clamp(0, 99);
+                } else {
+                    defender.health = (defender.health - attack_power).clamp(0, 99);
+                }
             } else {
                 defender.health = (defender.health - attack_power).clamp(0, 99);
             }

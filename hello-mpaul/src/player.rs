@@ -231,7 +231,7 @@ impl PlayerState {
             ""
         })
         .to_string();
-        let mut col:u32 = 0xffffffff;
+        let mut col: u32 = 0xffffffff;
         let pid = match self.player_id {
             PlayerId::P1 => "P1",
             PlayerId::P2 => "P2",
@@ -242,15 +242,8 @@ impl PlayerState {
         }
 
         text!(
-            &(pid.to_string() + " HEALTH: "),
-            x = (panel_width / 2.0)-50.0,
-            y = screen_height * self.row_health / 5.0,
-            font = Font::L,
-        );
-        
-        text!(
-            &(pid.to_string() + " " + &self.health.to_string()),
-            x = (panel_width / 2.0)+35.0,
+            &(active_star + pid + " HEALTH: " + &self.health.to_string()),
+            x = (panel_width / 2.0) + -50.0,
             y = (screen_height * self.row_health / 5.0) + 0.0,
             font = Font::L,
             color = col,
