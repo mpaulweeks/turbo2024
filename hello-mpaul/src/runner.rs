@@ -1,15 +1,18 @@
-use crate::*;
 use crate::server_comm::*;
-
-const MIN_ACTION_TICKS: f32 = 0.0;
-const MAX_ACTION_TICKS: f32 = 60.0;
+use crate::*;
 
 pub fn update(state: &mut GameState) {
-    let logic_snapshot = simulate_game(state.history.clone()).current;
-    let local = state.history.local.clone();
-
+    if state.history.actions.len() as i32 > state.history.action_index
+        && state.history.action_ticks == MAX_ACTION_TICKS
+    {
+        state.history.action_index += 1;
+        state.history.action_ticks = MIN_ACTION_TICKS;
+    }
     state.history.action_ticks =
         (state.history.action_ticks + 1.0).clamp(MIN_ACTION_TICKS, MAX_ACTION_TICKS);
+
+    let logic_snapshot = simulate_game(state.history.clone()).current;
+    let local = state.history.local.clone();
 
     // todo prevent actions while waiting for animation?
     if gamepad(0).a.just_pressed() {
@@ -21,12 +24,10 @@ pub fn update(state: &mut GameState) {
             Some(PlayerId::P2) => PlayerId::P2,
         };
         if let Some(action) = logic_snapshot.check_click(clicker) {
-            state.history.action_ticks = MIN_ACTION_TICKS;
             server_play_move(state, action);
         }
     } else if mouse(0).right.just_pressed() && local.is_none() {
         if let Some(action) = logic_snapshot.check_click(PlayerId::P2) {
-            state.history.action_ticks = MIN_ACTION_TICKS;
             server_play_move(state, action);
         }
     }
