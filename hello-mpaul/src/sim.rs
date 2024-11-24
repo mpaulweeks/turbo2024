@@ -108,8 +108,7 @@ impl GameSim {
             RoundPhase::Attack => {
                 // execute attacks
                 // todo weave these
-                let mut attacks = self.p1.attacks.clone();
-                attacks.append(&mut self.p2.attacks.clone());
+                let attacks = self.weave_attacks();
                 for attack in attacks.iter() {
                     self.execute_attack(attack.clone());
                 }
@@ -127,14 +126,34 @@ impl GameSim {
         }
     }
 
-    fn execute_attack(&mut self, attack: AttackState) {
-        let mut attacker = match attack.player_id {
-            PlayerId::P1 => self.p1.clone(),
-            PlayerId::P2 => self.p2.clone(),
+    fn weave_attacks(&self) -> Vec<AttackState> {
+        let active = if self.impulse.board.len() % 2 == 0 {
+            PlayerId::P2
+        } else {
+            PlayerId::P1
         };
-        let mut defender = match attack.player_id {
-            PlayerId::P1 => self.p2.clone(),
-            PlayerId::P2 => self.p1.clone(),
+        let (t1, t2) = match active {
+            PlayerId::P1 => (&self.p1, &self.p2),
+            PlayerId::P2 => (&self.p2, &self.p1),
+        };
+        let mut a1 = t1.attacks.clone();
+        let mut a2 = t2.attacks.clone();
+        let mut out: Vec<AttackState> = Vec::new();
+        while a1.len() > 0 || a2.len() > 0 {
+            if a1.len() > 0 {
+                out.push(a1.remove(0))
+            }
+            if a2.len() > 0 {
+                out.push(a2.remove(0))
+            }
+        }
+        return out;
+    }
+
+    fn execute_attack(&mut self, attack: AttackState) {
+        let (attacker, defender) = match attack.player_id {
+            PlayerId::P1 => (&mut self.p1, &mut self.p2),
+            PlayerId::P2 => (&mut self.p2, &mut self.p1),
         };
         let attack_unit = attacker
             .board
@@ -151,16 +170,6 @@ impl GameSim {
                 du.power = (du.power - attack_power).clamp(0, 99);
             } else {
                 defender.health = (defender.health - attack_power).clamp(0, 99);
-            }
-        }
-        match attacker.player_id {
-            PlayerId::P1 => {
-                self.p1 = attacker;
-                self.p2 = defender;
-            }
-            PlayerId::P2 => {
-                self.p1 = defender;
-                self.p2 = attacker;
             }
         }
     }
