@@ -87,67 +87,65 @@ impl PositionedUnit {
             color = 0xff00ffff,
         );
     }
-}
 
-pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
-    let is_ready = punit.unit.card.card_id == READY_CARD_ID;
-    let visible = visible || punit.unit.revealed;
-    let is_targetting = if let Some(targetter) = player.targeting {
-        targetter == punit.unit.card.card_id
-    } else {
-        false
-    };
-    let rimlight = if punit.unit.revealed {
-        Some(0xFFFFFFFF)
-    } else {
-        None
-    };
-    let highlight = if is_targetting {
-        Some(0x00FF0080)
-    } else if punit.unit.attacking {
-        Some(0xFF000080)
-    } else if is_ready && player.ready {
-        Some(0x00FF0080)
-    } else {
-        None
-    };
-    punit
-        .pos
-        .render_card(punit.unit.card.sprite, visible, rimlight, highlight);
-    if visible && !is_ready {
-        // draw unit details
-        sprite!(
-            &get_atk_sprite(punit.unit.power),
-            x = punit.pos.x + punit.pos.w / 2.0 - (POWER_WIDTH + POWER_MARGIN_X),
-            y = punit.pos.y + punit.pos.h / 2.0 - (POWER_HEIGHT + POWER_MARGIN_Y),
-        );
-        sprite!(
-            &get_clock_sprite(punit.unit.impulse_turn),
-            x = punit.pos.x + punit.pos.w / 2.0 - (CLOCK_WIDTH + CLOCK_MARGIN_X),
-            y = punit.pos.y - punit.pos.h / 2.0 - (CLOCK_MARGIN_Y),
-        );
-
-        let mut impulse_types: Vec<ImpulseType> = Vec::new();
-        for tuple in punit.unit.impulse_cost.iter() {
-            let (it, num) = tuple;
-            for _ in 0..(*num as i32) {
-                impulse_types.push(it.clone());
-            }
-        }
-        for (index, it) in impulse_types.iter().enumerate() {
+    pub fn render_unit(&self, player: PlayerState, visible: bool) {
+        let is_ready = self.unit.card.card_id == READY_CARD_ID;
+        let visible = visible || self.unit.revealed;
+        let is_targetting = if let Some(targetter) = player.targeting {
+            targetter == self.unit.card.card_id
+        } else {
+            false
+        };
+        let rimlight = if self.unit.revealed {
+            Some(0xFFFFFFFF)
+        } else {
+            None
+        };
+        let highlight = if is_targetting {
+            Some(0x00FF0080)
+        } else if self.unit.attacking {
+            Some(0xFF000080)
+        } else if is_ready && player.ready {
+            Some(0x00FF0080)
+        } else {
+            None
+        };
+        self.pos
+            .render_card(self.unit.card.sprite.clone(), visible, rimlight, highlight);
+        if visible && !is_ready {
+            // draw unit details
             sprite!(
-                &get_mana_sprite(it.clone()),
-                x = punit.pos.x + punit.pos.w / 2.0
-                    - (CLOCK_WIDTH
-                        + CLOCK_MARGIN_X
-                        + 1.0
-                        + ((MANA_MARGIN + MANA_WIDTH) * (index as f32 + 1.0))),
-                y = 3.0 + punit.pos.y - punit.pos.h / 2.0 + (MANA_MARGIN),
+                &get_atk_sprite(self.unit.power),
+                x = self.pos.x + self.pos.w / 2.0 - (POWER_WIDTH + POWER_MARGIN_X),
+                y = self.pos.y + self.pos.h / 2.0 - (POWER_HEIGHT + POWER_MARGIN_Y),
             );
+            sprite!(
+                &get_clock_sprite(self.unit.impulse_turn),
+                x = self.pos.x + self.pos.w / 2.0 - (CLOCK_WIDTH + CLOCK_MARGIN_X),
+                y = self.pos.y - self.pos.h / 2.0 - (CLOCK_MARGIN_Y),
+            );
+
+            let mut impulse_types: Vec<ImpulseType> = Vec::new();
+            for tuple in self.unit.impulse_cost.iter() {
+                let (it, num) = tuple;
+                for _ in 0..(*num as i32) {
+                    impulse_types.push(it.clone());
+                }
+            }
+            for (index, it) in impulse_types.iter().enumerate() {
+                sprite!(
+                    &get_mana_sprite(it.clone()),
+                    x = self.pos.x + self.pos.w / 2.0
+                        - (CLOCK_WIDTH
+                            + CLOCK_MARGIN_X
+                            + 1.0
+                            + ((MANA_MARGIN + MANA_WIDTH) * (index as f32 + 1.0))),
+                    y = 3.0 + self.pos.y - self.pos.h / 2.0 + (MANA_MARGIN),
+                );
+            }
         }
     }
 }
-
 struct UnitDraft {
     impulse_cost: UnitCost,
     impulse_turn: usize,

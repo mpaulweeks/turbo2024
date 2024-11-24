@@ -181,7 +181,7 @@ impl PlayerState {
         let positioned = tween_player(self.clone(), previous, percent, game.clone());
         for pcard in positioned.iter() {
             // todo forcing visible=true for local testing
-            render_unit(self.clone(), pcard.clone(), self.visible);
+            pcard.render_unit(self.clone(), self.visible);
         }
 
         // health
