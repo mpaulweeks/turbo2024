@@ -68,9 +68,9 @@ const MANA_WIDTH: f32 = 8.0;
 const MANA_MARGIN: f32 = 0.0;
 
 impl PositionedUnit {
-    pub fn render_unit(&self, player: PlayerState, visible: bool) {
+    pub fn render_unit(&self, player: PlayerState, player_visible: bool) {
         let is_ready = self.unit.card.card_id == READY_CARD_ID;
-        let visible = visible || self.unit.revealed;
+        let card_visible = player_visible || self.unit.revealed;
         let is_targetting = if let Some(targetter) = player.targeting {
             targetter == self.unit.card.card_id
         } else {
@@ -81,18 +81,24 @@ impl PositionedUnit {
         } else {
             None
         };
-        let highlight = if is_targetting {
+        let highlight = if is_ready && player.ready {
+            Some(0x00FF0080)
+        } else if !player_visible {
+            None
+        } else if is_targetting {
             Some(0x00FF0080)
         } else if self.unit.attacking {
             Some(0xFF000080)
-        } else if is_ready && player.ready {
-            Some(0x00FF0080)
         } else {
             None
         };
-        self.pos
-            .render_card(self.unit.card.sprite.clone(), visible, rimlight, highlight);
-        if visible && !is_ready {
+        self.pos.render_card(
+            self.unit.card.sprite.clone(),
+            card_visible,
+            rimlight,
+            highlight,
+        );
+        if card_visible && !is_ready {
             // draw unit details
             sprite!(
                 &get_atk_sprite(self.unit.power),

@@ -20,7 +20,11 @@ mod ui;
 use ui::*;
 mod unit;
 use unit::*;
+mod server_comm;
 mod util;
+
+use main_menu::*;
+
 use util::*;
 
 turbo::cfg! {r#"
@@ -48,8 +52,8 @@ turbo::init! {
         testing: bool,
   } = {
     Self {
-            history: create_game(&mut Vec::new()),
-            main_menue_state: MainMenuState { searching_for_match:false,},
+            history: create_game(None, &mut Vec::new()),
+            main_menue_state: MainMenuState::TitleScreen,
             match_info: MatchInfo::new(),
             game_mode: GameMode::MainMenu,
             testing: true,

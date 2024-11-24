@@ -150,11 +150,13 @@ impl CardPosition {
 
     pub fn render_target(&self, other: Option<CardPosition>) {
         if let Some(o) = other {
+            // Draw a circular cursor
+            circ!(d = 16, x = o.x - 8.0, y = o.y - 8.0, color = 0xe64539ff);
             path!(
                 start = (self.x, self.y),
                 end = (o.x, o.y),
                 width = 2,
-                color = 0xff00ffff,
+                color = 0xe64539ff,
             );
         } else {
             // Draw the planned attack

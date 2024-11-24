@@ -19,12 +19,14 @@ pub struct PlayerState {
     pub player_id: PlayerId,
     pub health: i32,
     row_board: f32,
+    row_attack: f32,
     row_hand: f32,
     row_health: f32,
     pub attacks: Vec<AttackState>,
     pub board: Vec<UnitCard>,
     pub hand: Vec<UnitCard>,
     pub deck: Vec<UnitCard>,
+    pub animating_attack: bool,
     pub ready: bool,
     pub targeting: Option<CardId>,
     pub visible: bool,
@@ -42,6 +44,11 @@ pub fn create_player(
         } else {
             1.0
         },
+        row_attack: if position == Position::Bottom {
+            2.5
+        } else {
+            1.5
+        },
         row_hand: if position == Position::Bottom {
             4.0
         } else {
@@ -58,6 +65,7 @@ pub fn create_player(
         board: Vec::new(),
         hand: Vec::new(),
         deck,
+        animating_attack: false,
         ready: false,
         targeting: None,
         visible: is_local,
@@ -106,9 +114,15 @@ pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> V
         } else {
             None
         };
+        let is_attacking = p.animating_attack && c.attacking;
+        let row = if is_attacking {
+            p.row_attack
+        } else {
+            p.row_board
+        };
         out.push(PositionedUnit {
             unit: c.clone(),
-            pos: position_card(p.row_board, i as f32, unit_action),
+            pos: position_card(row, i as f32, unit_action),
         });
     }
     for (i, c) in p.hand.iter().enumerate() {
@@ -156,22 +170,38 @@ fn tween_player(
 ) -> Vec<PositionedUnit> {
     let current_cards = position_player(game.clone(), current.clone(), current);
     let previous_cards = units_to_map(position_player(game.clone(), previous.clone(), previous));
+    let maybe_deck = current_cards
+        .iter()
+        .find(|punit| punit.unit.card.card_id == READY_CARD_ID);
     return current_cards
         .iter()
         .map(|curr_unit| {
-            if let Some(prev_unit) = previous_cards.get(&curr_unit.unit.card.card_id) {
+            let maybe_prev_card = previous_cards.get(&curr_unit.unit.card.card_id);
+            let maybe_prev_pos = if let Some(prev_unit) = maybe_prev_card {
+                Some(prev_unit.pos.clone())
+            } else if let Some(deck) = maybe_deck {
+                Some(deck.pos.clone())
+            } else {
+                None
+            };
+            if let Some(prev_pos) = maybe_prev_pos {
                 return PositionedUnit {
                     unit: curr_unit.unit.clone(),
-                    pos: tween_card(curr_unit.pos.clone(), prev_unit.pos.clone(), percent),
+                    pos: tween_card(curr_unit.pos.clone(), prev_pos.clone(), percent),
                 };
             } else {
                 return curr_unit.clone();
-            }
+            };
         })
         .collect();
 }
 
 impl PlayerState {
+    pub fn show_board(&mut self) {
+        for unit in self.board.iter_mut() {
+            unit.revealed = true;
+        }
+    }
     pub fn render_player(
         &self,
         previous: PlayerState,
@@ -190,6 +220,17 @@ impl PlayerState {
         let screen_height = res[1] as f32;
         let grid_width = screen_width * 0.8;
         let panel_width = screen_width - grid_width;
+        let active_player = if game.impulse.board.len() % 2 == 0 {
+            PlayerId::P2
+        } else {
+            PlayerId::P1
+        };
+        let active_star = (if active_player == self.player_id {
+            "*"
+        } else {
+            ""
+        })
+        .to_string();
         let mut col:u32 = 0xffffffff;
         let pid = match self.player_id {
             PlayerId::P1 => "P1",
@@ -208,7 +249,7 @@ impl PlayerState {
         );
         
         text!(
-            &(&self.health.to_string()),
+            &(pid.to_string() + " " + &self.health.to_string()),
             x = (panel_width / 2.0)+35.0,
             y = (screen_height * self.row_health / 5.0) + 0.0,
             font = Font::L,
