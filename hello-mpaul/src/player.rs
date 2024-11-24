@@ -208,7 +208,23 @@ impl PlayerState {
         if let Some(attacker) = self.targeting {
             for pcard in positioned.iter() {
                 if pcard.unit.card.card_id == attacker {
-                    pcard.render_target();
+                    pcard.pos.render_target(None);
+                }
+            }
+        }
+    }
+
+    pub fn render_attacks(&self, positioned: Vec<PositionedUnit>, other: Vec<PositionedUnit>) {
+        for attack in self.attacks.clone() {
+            let attack_unit = positioned
+                .iter()
+                .find(|punit| punit.unit.card.card_id == attack.source);
+            if let Some(au) = attack_unit {
+                let defend_unit = other
+                    .iter()
+                    .find(|punit| punit.unit.card.card_id == attack.target);
+                if let Some(du) = defend_unit {
+                    au.pos.render_target(Some(du.pos.clone()));
                 }
             }
         }

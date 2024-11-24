@@ -8,6 +8,8 @@ mod history;
 use history::*;
 mod impulse;
 use impulse::*;
+mod main_menu;
+use main_menu::*;
 mod player;
 use player::*;
 mod runner;
@@ -18,10 +20,7 @@ mod ui;
 use ui::*;
 mod unit;
 use unit::*;
-mod main_menu;
 mod util;
-use main_menu::*;
-
 use util::*;
 
 turbo::cfg! {r#"
@@ -53,7 +52,7 @@ turbo::init! {
             main_menue_state: MainMenuState { searching_for_match:false,},
             match_info: MatchInfo::new(),
             game_mode: GameMode::MainMenu,
-            testing: false,
+            testing: true,
         }
   }
 }
