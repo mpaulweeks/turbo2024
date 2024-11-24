@@ -14,11 +14,12 @@ pub struct GameHistory {
     pub actions: Vec<Action>,
 }
 
-pub fn create_game(rands: &mut Rands) -> GameHistory {
+pub fn create_game(local: Option<PlayerId>, rands: &mut Rands) -> GameHistory {
     return GameHistory {
         // local: Some(PlayerId::P1),
         // local: Some(PlayerId::P2),
-        local: None,
+        // local: None,
+        local,
         impulse_deck: create_impulse_deck(rands),
         p1deck: create_deck(rands),
         p2deck: create_deck(rands),
