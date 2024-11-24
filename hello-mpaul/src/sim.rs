@@ -177,10 +177,10 @@ impl GameSim {
                     au.power = (attack_power - du.power).clamp(0, 99);
                     du.power = (du.power - attack_power).clamp(0, 99);
                 } else {
-                    defender.health = (defender.health - attack_power).clamp(0, 99);
+                    defender.health = (defender.health - attack_power);
                 }
             } else {
-                defender.health = (defender.health - attack_power).clamp(0, 99);
+                defender.health = (defender.health - attack_power);
             }
         }
     }

@@ -20,8 +20,7 @@ pub struct CardPosition {
     pub action: Option<Action>,
 }
 
-
-pub fn render_background(){
+pub fn render_background() {
     let res = resolution();
     let screen_width = res[0] as f32;
     let screen_height = res[1] as f32;
@@ -31,20 +30,22 @@ pub fn render_background(){
 
     let mut n = 7;
 
-    sprite!{
+    sprite! {
         "TIME_TILE",
         x = -7.0 + (screen_width - grid_width) + slot_width,
         y = slot_height * 2.0,
-        
+
     }
 
     while n > 0 {
-        sprite!("Card_Place_Tile",
-            x = -4.0 + (screen_width - grid_width) + slot_width * (n)as f32,
-            y = slot_height * 1.0 -25.0,
+        sprite!(
+            "Card_Place_Tile",
+            x = -4.0 + (screen_width - grid_width) + slot_width * (n) as f32,
+            y = slot_height * 1.0 - 25.0,
             flip_y = true,
         );
-        sprite!("Card_Place_Tile",
+        sprite!(
+            "Card_Place_Tile",
             x = -4.0 + (screen_width - grid_width) + slot_width * n as f32,
             y = slot_height * 3.0 + 25.0,
         );
@@ -52,26 +53,24 @@ pub fn render_background(){
     }
 }
 
-pub fn position_card(row: f32, col: f32, action: Option<Action>) -> CardPosition {
+pub fn position_card(row: f32, col: f32, action: Option<Action>, arr_len: usize) -> CardPosition {
     let res = resolution();
     let screen_width = res[0] as f32;
     let screen_height = res[1] as f32;
     let grid_width = screen_width * 0.9;
-    let slot_width = grid_width / 8.0;
+    let base_slot_width = grid_width / 8.0;
+    let slot_width = grid_width / (arr_len as f32 + 2.0).clamp(8.0, 16.0);
     let slot_height = screen_height / 5.0;
     let card_width = 80.0;
     let card_height = 112.0;
     let mut h = 0;
-
-   
-
-    let mut x = -5.0 + (screen_width - grid_width) + slot_width * (col + 1.5);
+    let x = (screen_width - grid_width) + base_slot_width + slot_width * (col + 0.5);
     let mut y = slot_height * (row + 0.5);
 
-    if row == 4.0{
+    if row == 4.0 {
         y += 60.0;
         h = -40;
-       // x -= 30.0;
+        // x -= 30.0;
     }
     let left = (x - card_width / 2.0) as i32;
     let right = (x + card_width / 2.0) as i32;
@@ -80,22 +79,21 @@ pub fn position_card(row: f32, col: f32, action: Option<Action>) -> CardPosition
     let [mx, my] = mouse(0).position;
     let hover = mx > left && mx < right && my > top && my < bottom;
 
-    if row == 3.0{
-        y  += 25.0;
-    }
-    
-    if row == 1.0{
-        y  -= 25.0;
+    if row == 3.0 {
+        y += 25.0;
     }
 
-    if row == 0.0{
-        y  -= 35.0;
+    if row == 1.0 {
+        y -= 25.0;
     }
 
-    if hover && row >= 1.0{
+    if row == 0.0 {
+        y -= 35.0;
+    }
 
-        y-= 10.0;
-        if row == 4.0{
+    if hover && row >= 1.0 {
+        y -= 10.0;
+        if row == 4.0 {
             y -= 50.0;
         }
     }

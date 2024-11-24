@@ -95,6 +95,7 @@ pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> V
             (p.row_hand as f32 + p.row_board as f32) / 2.0,
             -1.5,
             ready_action,
+            1,
         ),
     });
 
@@ -122,7 +123,7 @@ pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> V
         };
         out.push(PositionedUnit {
             unit: c.clone(),
-            pos: position_card(row, i as f32, unit_action),
+            pos: position_card(row, i as f32, unit_action, p.board.len()),
         });
     }
     for (i, c) in p.hand.iter().enumerate() {
@@ -139,7 +140,7 @@ pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> V
         };
         out.push(PositionedUnit {
             unit: c.clone(),
-            pos: position_card(p.row_hand, i as f32, unit_action),
+            pos: position_card(p.row_hand, i as f32, unit_action, p.hand.len()),
         });
     }
     return out;
