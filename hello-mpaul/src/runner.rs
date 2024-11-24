@@ -65,6 +65,7 @@ pub fn render(state: &GameState) {
     );
 
     render_background();
+   
 
     render_impulse(delta.current.clone().impulse);
     let pos1 =
@@ -85,5 +86,6 @@ pub fn render(state: &GameState) {
         delta.current.p2.render_attacks(pos2.clone(), pos1.clone());
         delta.current.p2.render_target(pos2.clone());
     }
+    render_ui(delta.current.clone().impulse);
     render_round(delta.current.clone());
 }

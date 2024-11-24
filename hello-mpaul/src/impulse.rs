@@ -96,3 +96,92 @@ pub fn impulse_check(unit: UnitCard, state: ImpulseState) -> bool {
     }
     return can_afford;
 }
+
+pub fn render_ui(state: ImpulseState){
+    let mut blue =0.0;
+    let mut red = 0.0;
+    let mut green = 0.0;
+    let res = resolution();
+    let screen_width = res[0] as f32;
+    let screen_height = res[1] as f32;
+    let grid_width = screen_width * 0.9;
+    let slot_width = grid_width / 8.0;
+    let slot_height = screen_height / 5.0;
+
+    let impulse_types: Vec<ImpulseType> =
+    state.board.iter().map(|ic| ic.resource.clone()).collect();
+   // if unit.impulse_turn > impulse_types.len() {
+     //   return false;
+   // }
+
+    
+
+    let mut impulse_counts: HashMap<ImpulseType, usize> = HashMap::new();
+    for it in impulse_types.iter() {
+        *impulse_counts.entry(it.clone()).or_default() += 1;
+ 
+
+    }
+
+    let blueCount = impulse_counts.get(&ImpulseType::Blue).unwrap_or(&0);
+    let redCount = impulse_counts.get(&ImpulseType::Red).unwrap_or(&0);
+    let greenCount = impulse_counts.get(&ImpulseType::Green).unwrap_or(&0);
+    let timeCount = redCount + blueCount + greenCount;
+
+    sprite!(
+        "Mana_Sprites1",
+        x = screen_width/5.25,
+        y = screen_height /2.0,
+
+    );
+    sprite!(
+        "Mana_Sprites2",
+        x = screen_width/5.25,
+        y = (screen_height /2.0) + 20.0,
+
+    );
+    sprite!(
+        "Mana_Sprites3",
+        x = screen_width/5.25,
+        y = (screen_height /2.0) - 20.0,
+        
+
+    );
+
+    text!(
+        &format!("{}", blueCount),
+        x = screen_width/5.25 - 7.0,
+        y = screen_height /2.0,
+
+    );
+
+    text!(
+        &format!("{}", redCount),
+        x = screen_width/5.25 - 7.0,
+        y = (screen_height /2.0) + 20.0,
+
+    );
+
+    text!(
+        &format!("{}", greenCount),
+        x = screen_width/5.25 - 7.0,
+        y = (screen_height /2.0) - 20.0,
+
+    );
+
+    text!(
+        &format!("{}", greenCount),
+        x = screen_width/5.25 - 7.0,
+        y = (screen_height /2.0) - 20.0,
+
+    );
+
+    text!(
+        &format!("[TURN {}]", timeCount),
+        x = screen_width * 0.075,
+        y = screen_height / 2.0 + 20.0,
+        font = Font::L
+    );
+
+
+}

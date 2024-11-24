@@ -41,12 +41,12 @@ pub fn render_background(){
     while n > 0 {
         sprite!("Card_Place_Tile",
             x = -4.0 + (screen_width - grid_width) + slot_width * (n)as f32,
-            y = slot_height * 1.0,
+            y = slot_height * 1.0 -25.0,
             flip_y = true,
         );
         sprite!("Card_Place_Tile",
             x = -4.0 + (screen_width - grid_width) + slot_width * n as f32,
-            y = slot_height * 3.0,
+            y = slot_height * 3.0 + 25.0,
         );
         n -= 1;
     }
@@ -79,6 +79,19 @@ pub fn position_card(row: f32, col: f32, action: Option<Action>) -> CardPosition
     let bottom = (y + card_height / 2.0) as i32;
     let [mx, my] = mouse(0).position;
     let hover = mx > left && mx < right && my > top && my < bottom;
+
+    if row == 3.0{
+        y  += 25.0;
+    }
+    
+    if row == 1.0{
+        y  -= 25.0;
+    }
+
+    if row == 0.0{
+        y  -= 35.0;
+    }
+
     if hover && row >= 1.0{
 
         y-= 10.0;

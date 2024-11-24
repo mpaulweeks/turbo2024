@@ -265,5 +265,7 @@ pub fn render_round(state: GameSim) {
         x = screen_width * 0.05,
         y = screen_height / 2.0,
         font = Font::L
-    )
+    );
+
+    
 }
