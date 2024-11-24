@@ -26,6 +26,7 @@ pub struct PlayerState {
     pub board: Vec<UnitCard>,
     pub hand: Vec<UnitCard>,
     pub deck: Vec<UnitCard>,
+    pub animating_attack: bool,
     pub ready: bool,
     pub targeting: Option<CardId>,
     pub visible: bool,
@@ -64,6 +65,7 @@ pub fn create_player(
         board: Vec::new(),
         hand: Vec::new(),
         deck,
+        animating_attack: false,
         ready: false,
         targeting: None,
         visible: is_local,
@@ -112,7 +114,7 @@ pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> V
         } else {
             None
         };
-        let is_attacking = game.round_phase == RoundPhase::PreAttack && c.attacking;
+        let is_attacking = p.animating_attack && c.attacking;
         let row = if is_attacking {
             p.row_attack
         } else {

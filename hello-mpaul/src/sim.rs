@@ -104,6 +104,8 @@ impl GameSim {
                     self.round_phase = RoundPhase::PreAttack;
                     self.p1.ready = false;
                     self.p2.ready = false;
+                    self.p1.animating_attack = true;
+                    self.p2.animating_attack = true;
                     self.p1.show_board();
                     self.p2.show_board();
                 }
@@ -111,6 +113,8 @@ impl GameSim {
             RoundPhase::PreAttack => {
                 if self.action_ticks >= MAX_ACTION_TICKS {
                     self.round_phase = RoundPhase::PostAttack;
+                    self.p1.animating_attack = false;
+                    self.p2.animating_attack = false;
                 }
             }
             RoundPhase::PostAttack => {
