@@ -25,7 +25,7 @@ use main_menu::*;
 use util::*;
 
 turbo::cfg! {r#"
-    name = "hello-mpaul"
+    name = "variable_instance"
     version = "1.0.0"
     author = "Turbo"
     description = "Your first turbo os program"
@@ -34,6 +34,8 @@ turbo::cfg! {r#"
     [turbo-os]
     api-url = "https://os.turbo.computer"
 "#}
+
+const PROGRAM_ID: &str = "variable_instance";
 
 turbo::init! {
   struct GameState {
