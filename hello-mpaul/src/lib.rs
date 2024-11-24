@@ -20,6 +20,8 @@ mod unit;
 use unit::*;
 mod main_menu;
 mod util;
+mod server_comm;
+
 use main_menu::*;
 
 use util::*;
