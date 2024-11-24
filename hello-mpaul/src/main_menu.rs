@@ -87,26 +87,50 @@ fn finding_opponent_go(state: &mut GameState) {
         state.match_info = m;
     }
 
-    let user_id = os::client::user_id();
-    if let Some(ref id) = user_id {
-        if state.match_info.match_started
-        {
+    if state.match_info.match_started
+    {
+        let user_id = os::client::user_id();
+        if let Some(ref id) = user_id {
             if state.match_info.joining_user == id.to_string()
             {
                 //tell server to create rands
                 let bytes = state.match_info.match_id.to_le_bytes();
                 os::client::exec(PROGRAM_ID, "initialize_rands", &bytes);
+                os::client::exec(PROGRAM_ID, "clear_matchmaker", &bytes);
                 state.main_menue_state = MainMenuState::WaitingForRands;
-            }
-            else if state.match_info.inviter_user == id.to_string()
+                log!("Initializing rands");
+            } else if state.match_info.inviter_user == id.to_string()
             {
+                let bytes = state.match_info.match_id.to_le_bytes();
+                os::client::exec(PROGRAM_ID, "clear_matchmaker", &bytes);
                 state.main_menue_state = MainMenuState::WaitingForRands;
+                log!("Waiting for rands");
             }
         }
 
     }
 }
 
+
+#[export_name = "turbo/clear_matchmaker"]
+unsafe extern "C" fn on_clear_matchmaker() -> usize {
+
+    let mut match_info = os::server::read!(MatchInfo,&MATCHMAKING_FILE);
+    let user_id = os::server::get_user_id();
+
+    if match_info.inviter_user == user_id {
+        match_info.inviter_user = "".to_string();
+    }
+    else if match_info.joining_user == user_id {
+        match_info.joining_user = "".to_string();
+    }
+
+    let Ok(_) = os::server::write!(&MATCHMAKING_FILE, match_info) else {
+        return os::server::CANCEL;
+    };
+
+    os::server::COMMIT
+}
 
 #[export_name = "turbo/try_find_match"]
 unsafe extern "C" fn on_try_find_match() -> usize {
@@ -136,7 +160,7 @@ unsafe extern "C" fn on_try_find_match() -> usize {
     else if match_info.inviter_user != user_id
     {
         need_to_write_file = true;
-        if os::server::secs_since_unix_epoch() - match_info.last_refresh_time < 5
+        if os::server::secs_since_unix_epoch() - match_info.last_refresh_time < 2
         {
             // found a match to join
             match_info.joining_user = user_id;
@@ -212,6 +236,7 @@ fn wait_for_rands(state: &mut GameState) {
         .and_then(|file| Rands::try_from_slice(&file.contents).ok());
 
     if let Some(mut r) = rands {
+        log!("found rands");
         state.history = create_game(&mut r);
         state.game_mode = GameMode::PlayingMatch;
     }
