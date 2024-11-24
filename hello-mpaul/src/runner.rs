@@ -31,8 +31,6 @@ pub fn update() {
         }
     }
 
-    state.save();
-
     // log!("DEBUG: {:?}", state.history.actions);
     // os::server::log!()
 }
