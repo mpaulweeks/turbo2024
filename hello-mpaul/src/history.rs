@@ -13,8 +13,8 @@ pub struct GameHistory {
 pub fn create_game() -> GameHistory {
     return GameHistory {
         impulse_deck: create_impulse_deck(),
-        local: Some(PlayerId::P1),
-        // local: Some(PlayerId::P2),
+        // local: Some(PlayerId::P1),
+        local: Some(PlayerId::P2),
         // local: None,
         p1deck: create_deck(),
         p2deck: create_deck(),

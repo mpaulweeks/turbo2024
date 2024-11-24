@@ -53,6 +53,7 @@ impl GameSim {
         for unit in player.board.iter() {
             let mut new_unit = unit.clone();
             new_unit.attacking = false;
+            new_unit.revealed = true;
             if (new_unit.power > 0) {
                 new_board.push(new_unit);
             }

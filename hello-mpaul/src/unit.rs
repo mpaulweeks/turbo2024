@@ -8,6 +8,7 @@ pub struct UnitCard {
     pub impulse_turn: usize,
     pub power: i32,
     pub attacking: bool,
+    pub revealed: bool,
     pub card: Card,
 }
 
@@ -23,6 +24,7 @@ pub fn create_ready_unit() -> UnitCard {
         impulse_turn: 0,
         power: 0,
         attacking: false,
+        revealed: true,
         card: Card {
             card_id: READY_CARD_ID,
             sprite: "READY".to_string(),
@@ -41,6 +43,7 @@ pub fn create_deck() -> Deck {
                 impulse_turn: ud.impulse_turn,
                 impulse_cost: ud.impulse_cost.clone(),
                 attacking: false,
+                revealed: false,
                 card: Card {
                     card_id: deck.len() as u32 + 1,
                     sprite: ud.sprite.clone(),
@@ -88,11 +91,16 @@ impl PositionedUnit {
 
 pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
     let is_ready = punit.unit.card.card_id == READY_CARD_ID;
-    let visible = visible || is_ready;
+    let visible = visible || punit.unit.revealed;
     let is_targetting = if let Some(targetter) = player.targeting {
         targetter == punit.unit.card.card_id
     } else {
         false
+    };
+    let rimlight = if punit.unit.revealed {
+        Some(0x00FFFF80)
+    } else {
+        None
     };
     let highlight = if is_targetting {
         Some(0x00FF0080)
@@ -107,6 +115,7 @@ pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
         punit.pos.clone(),
         punit.unit.card.sprite,
         visible,
+        rimlight,
         highlight,
     );
     if visible && !is_ready {

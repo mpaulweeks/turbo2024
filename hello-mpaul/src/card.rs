@@ -47,14 +47,24 @@ pub fn position_card(row: f32, col: f32, action: Option<Action>) -> CardPosition
     };
 }
 
-pub fn render_card(pcard: CardPosition, sprite: String, visible: bool, highlight: Option<u32>) {
-    if pcard.hover {
-        let margin = pcard.w * 0.2;
-        let color: u32 = if visible && pcard.action.is_some() {
-            0x00FF00FF
+pub fn render_card(
+    pcard: CardPosition,
+    sprite: String,
+    visible: bool,
+    rimlight: Option<u32>,
+    highlight: Option<u32>,
+) {
+    let maybe_rim: Option<u32> = if pcard.hover {
+        if visible && pcard.action.is_some() {
+            Some(0x00FF00FF)
         } else {
-            0x8080FFFF
-        };
+            Some(0x8080FFFF)
+        }
+    } else {
+        rimlight
+    };
+    if let Some(color) = maybe_rim {
+        let margin = pcard.w * 0.2;
         rect!(
             x = pcard.x - (pcard.w + margin) / 2.0,
             y = pcard.y - (pcard.h + margin) / 2.0,

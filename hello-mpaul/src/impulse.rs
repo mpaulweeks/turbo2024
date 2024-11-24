@@ -78,6 +78,7 @@ pub fn render_impulse(state: ImpulseState) {
             pimp.impulse.card.sprite.clone(),
             true,
             None,
+            None,
         );
     }
 }
