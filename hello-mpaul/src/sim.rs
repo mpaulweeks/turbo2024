@@ -1,3 +1,5 @@
+use std::char::MAX;
+
 use crate::*;
 
 #[derive(PartialEq, Clone)]
@@ -6,11 +8,13 @@ pub enum RoundPhase {
     Draw,
     Deploy,
     Plan,
-    Attack,
+    PreAttack,
+    PostAttack,
 }
 
 #[derive(Clone)]
 pub struct GameSim {
+    pub action_ticks: f32,
     pub round_phase: RoundPhase,
     pub impulse: ImpulseState,
     pub p1: PlayerState,
@@ -100,12 +104,17 @@ impl GameSim {
             }
             RoundPhase::Plan => {
                 if self.p1.ready && self.p2.ready {
-                    self.round_phase = RoundPhase::Attack;
+                    self.round_phase = RoundPhase::PreAttack;
                     self.p1.ready = false;
                     self.p2.ready = false;
                 }
             }
-            RoundPhase::Attack => {
+            RoundPhase::PreAttack => {
+                if self.action_ticks == MAX_ACTION_TICKS {
+                    self.round_phase = RoundPhase::PostAttack;
+                }
+            }
+            RoundPhase::PostAttack => {
                 // execute attacks
                 // todo weave these
                 let attacks = self.weave_attacks();
@@ -244,7 +253,8 @@ pub fn render_round(state: GameSim) {
         RoundPhase::Draw => "Draw",
         RoundPhase::Deploy => "Deploy",
         RoundPhase::Plan => "Plan",
-        RoundPhase::Attack => "Attack",
+        RoundPhase::PreAttack => "PreAttack",
+        RoundPhase::PostAttack => "PostAttack",
     };
     let res = resolution();
     let screen_width = res[0] as f32;

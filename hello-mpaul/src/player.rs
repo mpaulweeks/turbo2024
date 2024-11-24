@@ -19,6 +19,7 @@ pub struct PlayerState {
     pub player_id: PlayerId,
     pub health: i32,
     row_board: f32,
+    row_attack: f32,
     row_hand: f32,
     row_health: f32,
     pub attacks: Vec<AttackState>,
@@ -41,6 +42,11 @@ pub fn create_player(
             3.0
         } else {
             1.0
+        },
+        row_attack: if position == Position::Bottom {
+            2.5
+        } else {
+            1.5
         },
         row_hand: if position == Position::Bottom {
             4.0
@@ -106,9 +112,15 @@ pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> V
         } else {
             None
         };
+        let is_attacking = game.round_phase == RoundPhase::PreAttack && c.attacking;
+        let row = if is_attacking {
+            p.row_attack
+        } else {
+            p.row_board
+        };
         out.push(PositionedUnit {
             unit: c.clone(),
-            pos: position_card(p.row_board, i as f32, unit_action),
+            pos: position_card(row, i as f32, unit_action),
         });
     }
     for (i, c) in p.hand.iter().enumerate() {

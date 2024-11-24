@@ -37,18 +37,21 @@ pub struct GameDelta {
 pub fn simulate_game(game: GameHistory) -> GameDelta {
     let mut current = match game.local {
         None => GameSim {
+            action_ticks: game.action_ticks,
             round_phase: RoundPhase::Begin,
             impulse: create_impulse_state(game.impulse_deck),
             p1: create_player(PlayerId::P1, game.p1deck, true, Position::Bottom),
             p2: create_player(PlayerId::P2, game.p2deck, true, Position::Top),
         },
         Some(PlayerId::P1) => GameSim {
+            action_ticks: game.action_ticks,
             round_phase: RoundPhase::Begin,
             impulse: create_impulse_state(game.impulse_deck),
             p1: create_player(PlayerId::P1, game.p1deck, true, Position::Bottom),
             p2: create_player(PlayerId::P2, game.p2deck, false, Position::Top),
         },
         Some(PlayerId::P2) => GameSim {
+            action_ticks: game.action_ticks,
             round_phase: RoundPhase::Begin,
             impulse: create_impulse_state(game.impulse_deck),
             p1: create_player(PlayerId::P1, game.p1deck, false, Position::Top),

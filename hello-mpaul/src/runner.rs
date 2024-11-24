@@ -17,6 +17,7 @@ pub fn update(state: &mut GameState) {
     // todo prevent actions while waiting for animation?
     if gamepad(0).a.just_pressed() {
         state.history.actions.pop();
+        state.history.action_index -= 1;
     } else if mouse(0).left.just_pressed() {
         let clicker = match local {
             None => PlayerId::P1,
