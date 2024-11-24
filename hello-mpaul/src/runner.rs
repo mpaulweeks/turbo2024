@@ -8,7 +8,7 @@ pub fn update(state: &mut GameState) {
         state.history.action_index += 1;
         state.history.action_ticks = MIN_ACTION_TICKS;
     }
-    state.history.action_ticks = (state.history.action_ticks + 1.0).clamp(-9999.0, 9999.0);
+    state.history.action_ticks = (state.history.action_ticks + 1.0).clamp(0.0, MAX_ACTION_TICKS);
 
     let logic_snapshot = simulate_game(state.history.clone()).current;
     let local = state.history.local.clone();

@@ -109,7 +109,7 @@ impl GameSim {
                 }
             }
             RoundPhase::PreAttack => {
-                if self.action_ticks >= MAX_ACTION_TICKS * 3.0 {
+                if self.action_ticks >= MAX_ACTION_TICKS {
                     self.round_phase = RoundPhase::PostAttack;
                 }
             }
