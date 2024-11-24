@@ -8,6 +8,8 @@ mod history;
 use history::*;
 mod impulse;
 use impulse::*;
+mod main_menu;
+use main_menu::*;
 mod player;
 use player::*;
 mod runner;
@@ -18,7 +20,6 @@ mod ui;
 use ui::*;
 mod unit;
 use unit::*;
-mod main_menu;
 mod util;
 mod server_comm;
 
@@ -55,7 +56,7 @@ turbo::init! {
             main_menue_state: MainMenuState::TitleScreen,
             match_info: MatchInfo::new(),
             game_mode: GameMode::MainMenu,
-            testing: false,
+            testing: true,
         }
   }
 }
@@ -71,8 +72,8 @@ turbo::go!({
             }
         }
         GameMode::PlayingMatch => {
-            update();
-            render();
+            update(&mut state);
+            render(&mut state);
         }
     }
 

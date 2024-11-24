@@ -98,6 +98,35 @@ impl CardPosition {
             );
         }
     }
+
+    pub fn render_target(&self, other: Option<CardPosition>) {
+        if let Some(o) = other {
+            path!(
+                start = (self.x, self.y),
+                end = (o.x, o.y),
+                width = 2,
+                color = 0xff00ffff,
+            );
+        } else {
+            // Draw the planned attack
+            // Get the mouse state for player 1
+            let m = mouse(0);
+
+            // Get the mouse's x and y positions
+            let [mx, my] = m.position;
+
+            // Draw a circular cursor
+            circ!(d = 16, x = mx - 8, y = my - 8, color = 0xe64539ff);
+
+            // Draw line from attacker to cursor
+            path!(
+                start = (self.x, self.y),
+                end = (mx, my),
+                width = 2,
+                color = 0xff00ffff,
+            );
+        }
+    }
 }
 
 fn tween(start: f32, end: f32, percent: f32) -> f32 {

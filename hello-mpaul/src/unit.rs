@@ -68,26 +68,6 @@ const MANA_WIDTH: f32 = 8.0;
 const MANA_MARGIN: f32 = 0.0;
 
 impl PositionedUnit {
-    pub fn render_target(&self) {
-        // Draw the planned attack
-        // Get the mouse state for player 1
-        let m = mouse(0);
-
-        // Get the mouse's x and y positions
-        let [mx, my] = m.position;
-
-        // Draw a circular cursor
-        circ!(d = 16, x = mx - 8, y = my - 8, color = 0xe64539ff);
-
-        // Draw line from attacker to cursor
-        path!(
-            start = (self.pos.x, self.pos.y),
-            end = (mx, my),
-            width = 2,
-            color = 0xff00ffff,
-        );
-    }
-
     pub fn render_unit(&self, player: PlayerState, visible: bool) {
         let is_ready = self.unit.card.card_id == READY_CARD_ID;
         let visible = visible || self.unit.revealed;
