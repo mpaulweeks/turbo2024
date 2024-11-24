@@ -8,6 +8,12 @@ pub enum PlayerId {
     P2,
 }
 
+#[derive(PartialEq)]
+pub enum Position {
+    Top,
+    Bottom,
+}
+
 #[derive(Clone)]
 pub struct PlayerState {
     pub player_id: PlayerId,
@@ -20,12 +26,18 @@ pub struct PlayerState {
     pub deck: Vec<UnitCard>,
     pub ready: bool,
     pub targeting: Option<CardId>,
+    pub visible: bool,
 }
 
-pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
+pub fn create_player(
+    index: PlayerId,
+    deck: Deck,
+    visible: bool,
+    position: Position,
+) -> PlayerState {
     return PlayerState {
-        row_board: if index == PlayerId::P1 { 3 } else { 1 },
-        row_hand: if index == PlayerId::P1 { 4 } else { 0 },
+        row_board: if position == Position::Bottom { 3 } else { 1 },
+        row_hand: if position == Position::Bottom { 4 } else { 0 },
         health: 20,
         player_id: index,
         attacks: Vec::new(),
@@ -34,6 +46,7 @@ pub fn create_player(index: PlayerId, deck: Deck) -> PlayerState {
         deck,
         ready: false,
         targeting: None,
+        visible,
     };
 }
 
@@ -154,7 +167,7 @@ impl PlayerState {
         let positioned = tween_player(self.clone(), previous, percent, game.clone());
         for pcard in positioned.iter() {
             // todo forcing visible=true for local testing
-            render_unit(self.clone(), pcard.clone(), true);
+            render_unit(self.clone(), pcard.clone(), self.visible);
         }
 
         // health

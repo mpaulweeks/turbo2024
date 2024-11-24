@@ -58,17 +58,17 @@ pub fn render() {
     );
 
     render_impulse(delta.current.clone().impulse);
-    let pos1 =
-        delta
-            .current
-            .p1
-            .render_player(delta.previous.p1, action_progress, delta.current.clone());
-    let pos2 =
-        delta
-            .current
-            .p2
-            .render_player(delta.previous.p2, action_progress, delta.current.clone());
-    delta.current.p1.render_target(pos1);
-    delta.current.p2.render_target(pos2);
+    let pos1 = delta.current.player_local.render_player(
+        delta.previous.player_local,
+        action_progress,
+        delta.current.clone(),
+    );
+    let pos2 = delta.current.player_remote.render_player(
+        delta.previous.player_remote,
+        action_progress,
+        delta.current.clone(),
+    );
+    delta.current.player_local.render_target(pos1);
+    delta.current.player_remote.render_target(pos2);
     render_round(delta.current.clone());
 }
