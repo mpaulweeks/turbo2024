@@ -21,7 +21,7 @@ pub struct ImpulseState {
     pub deck: Vec<ImpulseCard>,
 }
 
-pub fn create_impulse_deck() -> Vec<ImpulseCard> {
+pub fn create_impulse_deck(rands: &mut Rands) -> Vec<ImpulseCard> {
     let impulse_sprites: HashMap<ImpulseType, String> = HashMap::from([
         (ImpulseType::Red, "VICard_ResourceRed".to_string()),
         (ImpulseType::Green, "VICard_ResourceGreen".to_string()),
@@ -42,7 +42,7 @@ pub fn create_impulse_deck() -> Vec<ImpulseCard> {
             }
         }
     }
-    return shuffle(deck);
+    return shuffle(deck, rands);
 }
 
 pub fn create_impulse_state(deck: Vec<ImpulseCard>) -> ImpulseState {

@@ -33,7 +33,7 @@ pub fn create_ready_unit() -> UnitCard {
 }
 
 pub type Deck = Vec<UnitCard>;
-pub fn create_deck() -> Deck {
+pub fn create_deck(rands: &mut Rands) -> Deck {
     let drafts = unique_cards();
     let mut deck = Vec::new();
     for ud in drafts.iter() {
@@ -51,7 +51,7 @@ pub fn create_deck() -> Deck {
             });
         }
     }
-    return shuffle(deck);
+    return shuffle(deck, rands);
 }
 
 const POWER_WIDTH: f32 = 16.0;

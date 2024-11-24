@@ -18,8 +18,8 @@ mod ui;
 use ui::*;
 mod unit;
 use unit::*;
-mod util;
 mod main_menu;
+mod util;
 use main_menu::*;
 
 use util::*;
@@ -49,7 +49,7 @@ turbo::init! {
         testing: bool,
   } = {
     Self {
-            history: create_game(),
+            history: create_game(&mut Vec::new()),
             main_menue_state: MainMenuState { searching_for_match:false,},
             match_info: MatchInfo::new(),
             game_mode: GameMode::MainMenu,
@@ -62,9 +62,9 @@ turbo::go!({
     let mut state = GameState::load();
 
     match state.game_mode {
-        GameMode::MainMenu =>{
+        GameMode::MainMenu => {
             main_menu_go(&mut state);
-        },
+        }
         GameMode::PlayingMatch => {
             update();
             render();

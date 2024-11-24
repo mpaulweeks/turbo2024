@@ -2,22 +2,22 @@ use crate::*;
 
 #[derive(BorshSerialize, BorshDeserialize, PartialEq, Debug, Clone)]
 pub struct GameHistory {
-    impulse_deck: Vec<ImpulseCard>,
     pub local: Option<PlayerId>,
+    impulse_deck: Vec<ImpulseCard>,
     p1deck: Deck,
     p2deck: Deck,
     pub action_ticks: f32,
     pub actions: Vec<Action>,
 }
 
-pub fn create_game() -> GameHistory {
+pub fn create_game(rands: &mut Rands) -> GameHistory {
     return GameHistory {
-        impulse_deck: create_impulse_deck(),
         // local: Some(PlayerId::P1),
         // local: Some(PlayerId::P2),
         local: None,
-        p1deck: create_deck(),
-        p2deck: create_deck(),
+        impulse_deck: create_impulse_deck(rands),
+        p1deck: create_deck(rands),
+        p2deck: create_deck(rands),
         action_ticks: 0.0,
         actions: Vec::new(),
     };
