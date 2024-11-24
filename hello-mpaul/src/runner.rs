@@ -48,6 +48,7 @@ pub fn render(state: &GameState) {
     let screen_height = res[1] as f32;
     let grid_width = screen_width * 0.8;
     let panel_width = screen_width - grid_width;
+
     rect!(
         x = 0,
         y = 0,
@@ -62,6 +63,8 @@ pub fn render(state: &GameState) {
         h = screen_height,
         color = 0x2f5753ff,
     );
+
+    render_background();
 
     render_impulse(delta.current.clone().impulse);
     let pos1 =

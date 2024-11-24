@@ -192,7 +192,7 @@ fn unique_cards() -> Vec<UnitDraft> {
         UnitDraft {
             impulse_cost: vec![],
             impulse_turn: 1,
-            power: 0,
+            power: 1,
             sprite: "joker".to_string(),
         },
         UnitDraft {
