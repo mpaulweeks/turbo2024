@@ -156,17 +156,28 @@ fn tween_player(
 ) -> Vec<PositionedUnit> {
     let current_cards = position_player(game.clone(), current.clone(), current);
     let previous_cards = units_to_map(position_player(game.clone(), previous.clone(), previous));
+    let maybe_deck = current_cards
+        .iter()
+        .find(|punit| punit.unit.card.card_id == READY_CARD_ID);
     return current_cards
         .iter()
         .map(|curr_unit| {
-            if let Some(prev_unit) = previous_cards.get(&curr_unit.unit.card.card_id) {
+            let maybe_prev_card = previous_cards.get(&curr_unit.unit.card.card_id);
+            let maybe_prev_pos = if let Some(prev_unit) = maybe_prev_card {
+                Some(prev_unit.pos.clone())
+            } else if let Some(deck) = maybe_deck {
+                Some(deck.pos.clone())
+            } else {
+                None
+            };
+            if let Some(prev_pos) = maybe_prev_pos {
                 return PositionedUnit {
                     unit: curr_unit.unit.clone(),
-                    pos: tween_card(curr_unit.pos.clone(), prev_unit.pos.clone(), percent),
+                    pos: tween_card(curr_unit.pos.clone(), prev_pos.clone(), percent),
                 };
             } else {
                 return curr_unit.clone();
-            }
+            };
         })
         .collect();
 }
