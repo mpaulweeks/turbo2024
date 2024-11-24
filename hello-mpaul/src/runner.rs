@@ -57,19 +57,20 @@ pub fn render() {
         color = 0x2f5753ff,
     );
 
-    render_player(
+    render_impulse(delta.current.clone().impulse);
+    let pos1 = render_player(
         delta.current.clone().p1,
         delta.previous.p1,
         action_progress,
         delta.current.clone(),
     );
-    render_player(
+    let pos2 = render_player(
         delta.current.clone().p2,
         delta.previous.p2,
         action_progress,
         delta.current.clone(),
     );
-    render_impulse(delta.current.clone().impulse);
+    render_target(delta.current.clone().p1, pos1);
+    render_target(delta.current.clone().p2, pos2);
     render_round(delta.current.clone());
-    render_planned_attack(delta.current.clone());
 }

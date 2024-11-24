@@ -112,7 +112,8 @@ pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
                 &get_mana_sprite(it.clone()),
                 x = punit.pos.x + punit.pos.w / 2.0
                     - (CLOCK_WIDTH
-                        + CLOCK_MARGIN_X + 1.0
+                        + CLOCK_MARGIN_X
+                        + 1.0
                         + ((MANA_MARGIN + MANA_WIDTH) * (index as f32 + 1.0))),
                 y = 3.0 + punit.pos.y - punit.pos.h / 2.0 + (MANA_MARGIN),
             );

@@ -246,38 +246,22 @@ pub fn render_round(state: GameSim) {
     )
 }
 
+pub fn render_planned_attack(attacker: PositionedUnit) {
+    // draw the planned attack
+    // Get the mouse state for player 1
+    let m = mouse(0);
 
-pub fn render_planned_attack(state: GameSim ) {
+    // Get the mouse's x and y positions
+    let [mx, my] = m.position;
 
-    let action: Action;
-    if state.round_phase == RoundPhase::Plan{
-        //draw the planned attack
-        // Get the mouse state for player 1
-        let m = mouse(0);
+    // Draw a circular cursor
+    circ!(d = 16, x = mx - 8, y = my - 8, color = 0xe64539ff);
 
-        // Get the mouse's x and y positions
-        let [mx, my] = m.position;
-
-        // Draw a circular cursor
-        circ!(d = 16, x = mx - 8, y = my - 8, color = 0xe64539ff);
-        let vX = mx;
-        let vY = my;        
-
-       
-        
-
-        path!(
-            start = (256, 144),
-            end = (mx, my),
-            width = 2,
-            color = 0xff00ffff,
-        );
-    }
-
-    
-
-    let res = resolution();
-    let screen_width = res[0] as f32;
-    let screen_height = res[1] as f32;
-   
+    // Draw line from attacker to cursor
+    path!(
+        start = (attacker.pos.x, attacker.pos.y),
+        end = (mx, my),
+        width = 2,
+        color = 0xff00ffff,
+    );
 }

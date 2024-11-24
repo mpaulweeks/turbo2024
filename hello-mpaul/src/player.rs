@@ -144,11 +144,21 @@ fn tween_player(
         .collect();
 }
 
-pub fn render_player(current: PlayerState, previous: PlayerState, percent: f32, game: GameSim) {
-    let positioned = tween_player(current.clone(), previous, percent, game);
+pub fn render_player(
+    current: PlayerState,
+    previous: PlayerState,
+    percent: f32,
+    game: GameSim,
+) -> Vec<PositionedUnit> {
+    let positioned = tween_player(current.clone(), previous, percent, game.clone());
     for pcard in positioned.iter() {
         // todo forcing visible=true for local testing
         render_unit(current.clone(), pcard.clone(), true);
+        if let Some(attacker) = current.targeting {
+            if pcard.unit.card.card_id == attacker {
+                render_planned_attack(pcard.clone());
+            }
+        }
     }
 
     // health
@@ -165,5 +175,17 @@ pub fn render_player(current: PlayerState, previous: PlayerState, percent: f32, 
             PlayerId::P2 => screen_height * 0.35,
         },
         font = Font::L,
-    )
+    );
+
+    return positioned;
+}
+
+pub fn render_target(current: PlayerState, positioned: Vec<PositionedUnit>) {
+    if let Some(attacker) = current.targeting {
+        for pcard in positioned.iter() {
+            if pcard.unit.card.card_id == attacker {
+                render_planned_attack(pcard.clone());
+            }
+        }
+    }
 }
