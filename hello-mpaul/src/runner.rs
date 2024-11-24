@@ -54,7 +54,7 @@ pub fn render() {
         y = 0,
         w = grid_width,
         h = screen_height,
-        color = 0x004000ff,
+        color = 0x2f5753ff,
     );
 
     render_player(
@@ -71,4 +71,5 @@ pub fn render() {
     );
     render_impulse(delta.current.clone().impulse);
     render_round(delta.current.clone());
+    render_planned_attack(delta.current.clone());
 }

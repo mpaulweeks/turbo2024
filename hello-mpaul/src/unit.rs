@@ -112,9 +112,9 @@ pub fn render_unit(player: PlayerState, punit: PositionedUnit, visible: bool) {
                 &get_mana_sprite(it.clone()),
                 x = punit.pos.x + punit.pos.w / 2.0
                     - (CLOCK_WIDTH
-                        + CLOCK_MARGIN_X
+                        + CLOCK_MARGIN_X + 1.0
                         + ((MANA_MARGIN + MANA_WIDTH) * (index as f32 + 1.0))),
-                y = punit.pos.y - punit.pos.h / 2.0 + (MANA_MARGIN),
+                y = 3.0 + punit.pos.y - punit.pos.h / 2.0 + (MANA_MARGIN),
             );
         }
     }
@@ -136,46 +136,58 @@ fn unique_cards() -> Vec<UnitDraft> {
             sprite: "Chancellor_Tenn".to_string(),
         },
         UnitDraft {
-            impulse_cost: vec![(ImpulseType::Blue, 1)],
-            impulse_turn: 5,
-            power: 3,
+            impulse_cost: vec![],
+            impulse_turn: 1,
+            power: 1,
             sprite: "Jack_of_Club".to_string(),
         },
         UnitDraft {
-            impulse_cost: vec![(ImpulseType::Red, 1)],
-            impulse_turn: 5,
-            power: 3,
+            impulse_cost: vec![],
+            impulse_turn: 1,
+            power: 1,
             sprite: "Jack_of_Diamond".to_string(),
         },
         UnitDraft {
             impulse_cost: vec![(ImpulseType::Red, 1)],
-            impulse_turn: 5,
-            power: 3,
+            impulse_turn: 1,
+            power: 2,
             sprite: "Jack_of_Heart".to_string(),
         },
         UnitDraft {
-            impulse_cost: vec![(ImpulseType::Blue, 3)],
-            impulse_turn: 3,
-            power: 4,
+            impulse_cost: vec![(ImpulseType::Blue, 1)],
+            impulse_turn: 2,
+            power: 3,
             sprite: "Jack_of_Spade".to_string(),
         },
         UnitDraft {
-            impulse_cost: vec![(ImpulseType::Red, 3), (ImpulseType::Blue, 1)],
+            impulse_cost: vec![(ImpulseType::Red, 3), (ImpulseType::Blue, 2)],
             impulse_turn: 10,
-            power: 9,
+            power: 14,
             sprite: "King_Chance".to_string(),
         },
         UnitDraft {
             impulse_cost: vec![],
             impulse_turn: 8,
-            power: 6,
+            power: 7,
             sprite: "Queen_Card".to_string(),
         },
         UnitDraft {
-            impulse_cost: vec![],
+            impulse_cost: vec![(ImpulseType::Blue, 1)],
             impulse_turn: 3,
-            power: 2,
+            power: 4,
             sprite: "TangoNiner".to_string(),
+        },
+        UnitDraft {
+            impulse_cost: vec![],
+            impulse_turn: 1,
+            power: 0,
+            sprite: "joker".to_string(),
+        },
+        UnitDraft {
+            impulse_cost: vec![(ImpulseType::Red, 1), (ImpulseType::Blue, 1)],
+            impulse_turn: 4,
+            power: 6,
+            sprite: "ace_one".to_string(),
         },
     ];
 }
