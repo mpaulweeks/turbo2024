@@ -18,8 +18,9 @@ pub enum Position {
 pub struct PlayerState {
     pub player_id: PlayerId,
     pub health: i32,
-    row_board: u8,
-    row_hand: u8,
+    row_board: f32,
+    row_hand: f32,
+    row_health: f32,
     pub attacks: Vec<AttackState>,
     pub board: Vec<UnitCard>,
     pub hand: Vec<UnitCard>,
@@ -32,12 +33,25 @@ pub struct PlayerState {
 pub fn create_player(
     index: PlayerId,
     deck: Deck,
-    visible: bool,
+    is_local: bool,
     position: Position,
 ) -> PlayerState {
     return PlayerState {
-        row_board: if position == Position::Bottom { 3 } else { 1 },
-        row_hand: if position == Position::Bottom { 4 } else { 0 },
+        row_board: if position == Position::Bottom {
+            3.0
+        } else {
+            1.0
+        },
+        row_hand: if position == Position::Bottom {
+            4.0
+        } else {
+            0.0
+        },
+        row_health: if position == Position::Bottom {
+            3.0
+        } else {
+            2.0
+        },
         health: 20,
         player_id: index,
         attacks: Vec::new(),
@@ -46,7 +60,7 @@ pub fn create_player(
         deck,
         ready: false,
         targeting: None,
-        visible,
+        visible: is_local,
     };
 }
 
@@ -94,7 +108,7 @@ pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> V
         };
         out.push(PositionedUnit {
             unit: c.clone(),
-            pos: position_card(p.row_board as f32, i as f32, unit_action),
+            pos: position_card(p.row_board, i as f32, unit_action),
         });
     }
     for (i, c) in p.hand.iter().enumerate() {
@@ -111,7 +125,7 @@ pub fn position_player(game: GameSim, p: PlayerState, clicker: PlayerState) -> V
         };
         out.push(PositionedUnit {
             unit: c.clone(),
-            pos: position_card(p.row_hand as f32, i as f32, unit_action),
+            pos: position_card(p.row_hand, i as f32, unit_action),
         });
     }
     return out;
@@ -176,13 +190,14 @@ impl PlayerState {
         let screen_height = res[1] as f32;
         let grid_width = screen_width * 0.8;
         let panel_width = screen_width - grid_width;
+        let pid = match self.player_id {
+            PlayerId::P1 => "P1",
+            PlayerId::P2 => "P2",
+        };
         text!(
-            &self.health.to_string(),
+            &(pid.to_string() + " " + &self.health.to_string()),
             x = panel_width / 2.0,
-            y = match self.player_id {
-                PlayerId::P1 => screen_height * 0.65,
-                PlayerId::P2 => screen_height * 0.35,
-            },
+            y = screen_height * self.row_health / 5.0,
             font = Font::L,
         );
 

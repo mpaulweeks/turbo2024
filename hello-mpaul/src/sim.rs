@@ -13,8 +13,8 @@ pub enum RoundPhase {
 pub struct GameSim {
     pub round_phase: RoundPhase,
     pub impulse: ImpulseState,
-    pub player_local: PlayerState,
-    pub player_remote: PlayerState,
+    pub p1: PlayerState,
+    pub p2: PlayerState,
 }
 
 impl GameSim {
@@ -27,10 +27,11 @@ impl GameSim {
             None => self::println!("Empty deck!"),
         }
     }
+
     pub fn draw_player(&mut self, player_id: PlayerId) {
         let mut player = match player_id {
-            PlayerId::P1 => self.player_local.clone(),
-            PlayerId::P2 => self.player_remote.clone(),
+            PlayerId::P1 => self.p1.clone(),
+            PlayerId::P2 => self.p2.clone(),
         };
         let card = player.deck.pop();
         match card {
@@ -40,14 +41,14 @@ impl GameSim {
             None => self::println!("Empty deck!"),
         }
         match player_id {
-            PlayerId::P1 => self.player_local = player,
-            PlayerId::P2 => self.player_remote = player,
+            PlayerId::P1 => self.p1 = player,
+            PlayerId::P2 => self.p2 = player,
         }
     }
     pub fn clear_dead(&mut self, player_id: PlayerId) {
         let mut player = match player_id {
-            PlayerId::P1 => self.player_local.clone(),
-            PlayerId::P2 => self.player_remote.clone(),
+            PlayerId::P1 => self.p1.clone(),
+            PlayerId::P2 => self.p2.clone(),
         };
         let mut new_board: Vec<UnitCard> = Vec::new();
         for unit in player.board.iter() {
@@ -60,8 +61,8 @@ impl GameSim {
         }
         player.board = new_board;
         match player_id {
-            PlayerId::P1 => self.player_local = player,
-            PlayerId::P2 => self.player_remote = player,
+            PlayerId::P1 => self.p1 = player,
+            PlayerId::P2 => self.p2 = player,
         }
     }
     pub fn advance(&mut self) {
@@ -87,34 +88,34 @@ impl GameSim {
                 self.draw_player(PlayerId::P1);
                 self.draw_player(PlayerId::P2);
                 self.round_phase = RoundPhase::Deploy;
-                self.player_local.ready = false;
-                self.player_remote.ready = false;
+                self.p1.ready = false;
+                self.p2.ready = false;
             }
             RoundPhase::Deploy => {
-                if self.player_local.ready && self.player_remote.ready {
+                if self.p1.ready && self.p2.ready {
                     self.round_phase = RoundPhase::Plan;
-                    self.player_local.ready = false;
-                    self.player_remote.ready = false;
+                    self.p1.ready = false;
+                    self.p2.ready = false;
                 }
             }
             RoundPhase::Plan => {
-                if self.player_local.ready && self.player_remote.ready {
+                if self.p1.ready && self.p2.ready {
                     self.round_phase = RoundPhase::Attack;
-                    self.player_local.ready = false;
-                    self.player_remote.ready = false;
+                    self.p1.ready = false;
+                    self.p2.ready = false;
                 }
             }
             RoundPhase::Attack => {
                 // execute attacks
                 // todo weave these
-                let mut attacks = self.player_local.attacks.clone();
-                attacks.append(&mut self.player_remote.attacks.clone());
+                let mut attacks = self.p1.attacks.clone();
+                attacks.append(&mut self.p2.attacks.clone());
                 for attack in attacks.iter() {
                     self.execute_attack(attack.clone());
                 }
                 // clear attacks
-                self.player_local.attacks = Vec::new();
-                self.player_remote.attacks = Vec::new();
+                self.p1.attacks = Vec::new();
+                self.p2.attacks = Vec::new();
                 // clear up dead and reset attacking
                 self.clear_dead(PlayerId::P1);
                 self.clear_dead(PlayerId::P2);
@@ -128,12 +129,12 @@ impl GameSim {
 
     fn execute_attack(&mut self, attack: AttackState) {
         let mut attacker = match attack.player_id {
-            PlayerId::P1 => self.player_local.clone(),
-            PlayerId::P2 => self.player_remote.clone(),
+            PlayerId::P1 => self.p1.clone(),
+            PlayerId::P2 => self.p2.clone(),
         };
         let mut defender = match attack.player_id {
-            PlayerId::P1 => self.player_remote.clone(),
-            PlayerId::P2 => self.player_local.clone(),
+            PlayerId::P1 => self.p2.clone(),
+            PlayerId::P2 => self.p1.clone(),
         };
         let attack_unit = attacker
             .board
@@ -154,20 +155,20 @@ impl GameSim {
         }
         match attacker.player_id {
             PlayerId::P1 => {
-                self.player_local = attacker;
-                self.player_remote = defender;
+                self.p1 = attacker;
+                self.p2 = defender;
             }
             PlayerId::P2 => {
-                self.player_local = defender;
-                self.player_remote = attacker;
+                self.p1 = defender;
+                self.p2 = attacker;
             }
         }
     }
 
     pub fn apply_action(&mut self, action: Action) {
         let mut player = match action.player_id {
-            PlayerId::P1 => self.player_local.clone(),
-            PlayerId::P2 => self.player_remote.clone(),
+            PlayerId::P1 => self.p1.clone(),
+            PlayerId::P2 => self.p2.clone(),
         };
 
         match action.action_type {
@@ -208,23 +209,20 @@ impl GameSim {
             }
         }
         match action.player_id {
-            PlayerId::P1 => self.player_local = player,
-            PlayerId::P2 => self.player_remote = player,
+            PlayerId::P1 => self.p1 = player,
+            PlayerId::P2 => self.p2 = player,
         }
     }
 
     pub fn check_click(&self, player_id: PlayerId) -> Option<Action> {
         let clicker = match player_id {
-            PlayerId::P1 => self.player_local.clone(),
-            PlayerId::P2 => self.player_remote.clone(),
+            PlayerId::P1 => self.p1.clone(),
+            PlayerId::P2 => self.p2.clone(),
         };
-        if let Some(action) = click_action(self.clone(), self.player_local.clone(), clicker.clone())
-        {
+        if let Some(action) = click_action(self.clone(), self.p1.clone(), clicker.clone()) {
             return Some(action);
         }
-        if let Some(action) =
-            click_action(self.clone(), self.player_remote.clone(), clicker.clone())
-        {
+        if let Some(action) = click_action(self.clone(), self.p2.clone(), clicker.clone()) {
             return Some(action);
         }
         return None;
