@@ -3,8 +3,7 @@ use crate::*;
 const MIN_ACTION_TICKS: f32 = 0.0;
 const MAX_ACTION_TICKS: f32 = 60.0;
 
-pub fn update() {
-    let mut state = GameState::load();
+pub fn update(state: &mut GameState) {
     let logic_snapshot = simulate_game(state.history.clone()).current;
     let local = state.history.local.clone();
 
@@ -35,8 +34,7 @@ pub fn update() {
     // os::server::log!()
 }
 
-pub fn render() {
-    let state = GameState::load();
+pub fn render(state: &GameState) {
     let action_progress = (state.history.action_ticks - MIN_ACTION_TICKS) / MAX_ACTION_TICKS;
     let delta = simulate_game(state.history.clone());
 

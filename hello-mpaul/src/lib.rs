@@ -68,8 +68,8 @@ turbo::go!({
             }
         }
         GameMode::PlayingMatch => {
-            update();
-            render();
+            update(&mut state);
+            render(&mut state);
         }
     }
 
