@@ -56,7 +56,7 @@ turbo::init! {
             main_menue_state: MainMenuState::TitleScreen,
             match_info: MatchInfo::new(),
             game_mode: GameMode::MainMenu,
-            testing: true,
+            testing: false,
         }
   }
 }

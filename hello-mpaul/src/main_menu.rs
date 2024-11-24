@@ -224,7 +224,17 @@ fn wait_for_rands(state: &mut GameState) {
         .and_then(|file| Rands::try_from_slice(&file.contents).ok());
 
     if let Some(mut r) = rands {
-        state.history = create_game(None, &mut r);
+        let mut player_id:Option<PlayerId> = None;
+        let user_id = os::client::user_id();
+        if let Some(ref uid) = user_id {
+            if state.match_info.inviter_user == *uid {
+                player_id = Option::from(PlayerId::P1);
+            }
+            else {
+                player_id = Option::from(PlayerId::P2);
+            }
+        }
+        state.history = create_game(player_id, &mut r);
         state.game_mode = GameMode::PlayingMatch;
     }
 }
