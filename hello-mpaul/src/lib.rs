@@ -23,8 +23,6 @@ use unit::*;
 mod server_comm;
 mod util;
 
-use main_menu::*;
-
 use util::*;
 
 turbo::cfg! {r#"

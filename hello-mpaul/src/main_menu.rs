@@ -82,20 +82,17 @@ fn finding_opponent_go(state: &mut GameState) {
         state.match_info = m;
     }
 
-    if state.match_info.match_started
-    {
+    if state.match_info.match_started {
         let user_id = os::client::user_id();
         if let Some(ref id) = user_id {
-            if state.match_info.joining_user == id.to_string()
-            {
+            if state.match_info.joining_user == id.to_string() {
                 //tell server to create rands
                 let bytes = state.match_info.match_id.to_le_bytes();
                 os::client::exec(PROGRAM_ID, "initialize_rands", &bytes);
                 os::client::exec(PROGRAM_ID, "clear_matchmaker", &bytes);
                 state.main_menue_state = MainMenuState::WaitingForRands;
                 log!("Initializing rands");
-            } else if state.match_info.inviter_user == id.to_string()
-            {
+            } else if state.match_info.inviter_user == id.to_string() {
                 let bytes = state.match_info.match_id.to_le_bytes();
                 os::client::exec(PROGRAM_ID, "clear_matchmaker", &bytes);
                 state.main_menue_state = MainMenuState::WaitingForRands;
@@ -105,17 +102,14 @@ fn finding_opponent_go(state: &mut GameState) {
     }
 }
 
-
 #[export_name = "turbo/clear_matchmaker"]
 unsafe extern "C" fn on_clear_matchmaker() -> usize {
-
-    let mut match_info = os::server::read!(MatchInfo,&MATCHMAKING_FILE);
+    let mut match_info = os::server::read!(MatchInfo, &MATCHMAKING_FILE);
     let user_id = os::server::get_user_id();
 
     if match_info.inviter_user == user_id {
         match_info.inviter_user = "".to_string();
-    }
-    else if match_info.joining_user == user_id {
+    } else if match_info.joining_user == user_id {
         match_info.joining_user = "".to_string();
     }
 
@@ -152,8 +146,7 @@ unsafe extern "C" fn on_try_find_match() -> usize {
         os::server::log!("Creating Match: {}", match_info.match_id);
     } else if match_info.inviter_user != user_id {
         need_to_write_file = true;
-        if os::server::secs_since_unix_epoch() - match_info.last_refresh_time < 2
-        {
+        if os::server::secs_since_unix_epoch() - match_info.last_refresh_time < 2 {
             // found a match to join
             match_info.joining_user = user_id;
             match_info.match_started = true;
@@ -192,8 +185,19 @@ fn title_screen_go(state: &mut GameState) {
     // draw find match button
     let (w, h) = (220, 50);
     let (x, y) = (320, 380);
-    draw_button(w, h, x, y);
+    let y2 = y + ((h as f32) * 1.5) as i32;
+    let mut color = BUTTON_COLOR;
+    let mut color2 = BUTTON_COLOR;
 
+    let m = mouse(0);
+
+    if button_contains_pos(m.position[0], m.position[1], w, h, x, y) {
+        color = 0x000000FF;
+        if m.left.just_pressed() {
+            state.main_menue_state = MainMenuState::WaitingForMatch;
+        }
+    }
+    draw_button(w, h, x, y, color);
     text!(
         "Find Match",
         x = x + 35,
@@ -202,11 +206,20 @@ fn title_screen_go(state: &mut GameState) {
         color = BUTTON_TEXT_COLOR
     );
 
-    let m = mouse(0);
-
-    if m.left.just_pressed() && button_contains_pos(m.position[0], m.position[1], w, h, x, y) {
-        state.main_menue_state = MainMenuState::WaitingForMatch;
+    if button_contains_pos(m.position[0], m.position[1], w, h, x, y2) {
+        color2 = 0x000000FF;
+        if m.left.just_pressed() {
+            state.testing = true;
+        }
     }
+    draw_button(w, h, x, y2, color2);
+    text!(
+        "Play Local",
+        x = x + 35,
+        y = y2 + 18,
+        font = Font::XL,
+        color = BUTTON_TEXT_COLOR
+    );
 }
 
 fn wait_for_rands(state: &mut GameState) {
@@ -224,13 +237,12 @@ fn wait_for_rands(state: &mut GameState) {
         .and_then(|file| Rands::try_from_slice(&file.contents).ok());
 
     if let Some(mut r) = rands {
-        let mut player_id:Option<PlayerId> = None;
+        let mut player_id: Option<PlayerId> = None;
         let user_id = os::client::user_id();
         if let Some(ref uid) = user_id {
             if state.match_info.inviter_user == *uid {
                 player_id = Option::from(PlayerId::P1);
-            }
-            else {
+            } else {
                 player_id = Option::from(PlayerId::P2);
             }
         }
@@ -239,15 +251,8 @@ fn wait_for_rands(state: &mut GameState) {
     }
 }
 
-fn draw_button(w: i32, h: i32, x: i32, y: i32) {
-    rect!(
-        w = w,
-        h = h,
-        y = y,
-        x = x,
-        color = BUTTON_COLOR,
-        border_radius = 6
-    );
+fn draw_button(w: i32, h: i32, x: i32, y: i32, color: u32) {
+    rect!(w = w, h = h, y = y, x = x, color = color, border_radius = 6);
 }
 
 fn button_contains_pos(px: i32, py: i32, w: i32, h: i32, x: i32, y: i32) -> bool {
