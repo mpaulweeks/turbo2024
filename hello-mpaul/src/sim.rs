@@ -168,6 +168,7 @@ impl GameSim {
             PlayerId::P1 => self.p1.clone(),
             PlayerId::P2 => self.p2.clone(),
         };
+
         match action.action_type {
             ActionType::Ready => {
                 player.ready = true;

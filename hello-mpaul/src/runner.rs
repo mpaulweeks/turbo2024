@@ -54,21 +54,21 @@ pub fn render() {
         y = 0,
         w = grid_width,
         h = screen_height,
-        color = 0x004000ff,
+        color = 0x2f5753ff,
     );
 
-    render_player(
-        delta.current.clone().p1,
-        delta.previous.p1,
-        action_progress,
-        delta.current.clone(),
-    );
-    render_player(
-        delta.current.clone().p2,
-        delta.previous.p2,
-        action_progress,
-        delta.current.clone(),
-    );
     render_impulse(delta.current.clone().impulse);
+    let pos1 =
+        delta
+            .current
+            .p1
+            .render_player(delta.previous.p1, action_progress, delta.current.clone());
+    let pos2 =
+        delta
+            .current
+            .p2
+            .render_player(delta.previous.p2, action_progress, delta.current.clone());
+    delta.current.p1.render_target(pos1);
+    delta.current.p2.render_target(pos2);
     render_round(delta.current.clone());
 }
