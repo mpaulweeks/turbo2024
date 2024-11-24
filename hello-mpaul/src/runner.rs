@@ -75,9 +75,13 @@ pub fn render(state: &GameState) {
             .current
             .p2
             .render_player(delta.previous.p2, action_progress, delta.current.clone());
-    delta.current.p1.render_attacks(pos1.clone(), pos2.clone());
-    delta.current.p2.render_attacks(pos2.clone(), pos1.clone());
-    delta.current.p1.render_target(pos1);
-    delta.current.p2.render_target(pos2);
+    if delta.current.p1.visible {
+        delta.current.p1.render_attacks(pos1.clone(), pos2.clone());
+        delta.current.p1.render_target(pos1.clone());
+    }
+    if delta.current.p2.visible {
+        delta.current.p2.render_attacks(pos2.clone(), pos1.clone());
+        delta.current.p2.render_target(pos2.clone());
+    }
     render_round(delta.current.clone());
 }
