@@ -64,6 +64,9 @@ turbo::go!({
     match state.game_mode {
         GameMode::MainMenu =>{
             main_menu_go(&mut state);
+            if state.testing {
+                state.game_mode = GameMode::PlayingMatch;
+            }
         },
         GameMode::PlayingMatch => {
             update();
