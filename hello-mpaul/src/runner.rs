@@ -8,7 +8,7 @@ pub fn update(state: &mut GameState) {
         state.history.action_index += 1;
         state.history.action_ticks = MIN_ACTION_TICKS;
     }
-    state.history.action_ticks = (state.history.action_ticks + 1.0).clamp(0.0, MAX_ACTION_TICKS);
+    state.history.action_ticks = (state.history.action_ticks + 1.0).clamp(-9999.0, 9999.0);
 
     let logic_snapshot = simulate_game(state.history.clone()).current;
     let local = state.history.local.clone();
@@ -39,7 +39,9 @@ pub fn update(state: &mut GameState) {
 }
 
 pub fn render(state: &GameState) {
-    let action_progress = (state.history.action_ticks - MIN_ACTION_TICKS) / MAX_ACTION_TICKS;
+    let action_progress = (state.history.action_ticks - MIN_ACTION_TICKS)
+        .clamp(MIN_ACTION_TICKS, MAX_ACTION_TICKS)
+        / MAX_ACTION_TICKS;
     let delta = simulate_game(state.history.clone());
 
     // render board background
@@ -65,7 +67,6 @@ pub fn render(state: &GameState) {
     );
 
     render_background();
-   
 
     render_impulse(delta.current.clone().impulse);
     let pos1 =

@@ -37,6 +37,7 @@ pub struct GameDelta {
 pub fn simulate_game(game: GameHistory) -> GameDelta {
     let mut current = match game.local {
         None => GameSim {
+            is_replay: false,
             action_ticks: game.action_ticks,
             round_phase: RoundPhase::Begin,
             impulse: create_impulse_state(game.impulse_deck),
@@ -44,6 +45,7 @@ pub fn simulate_game(game: GameHistory) -> GameDelta {
             p2: create_player(PlayerId::P2, game.p2deck, true, Position::Top),
         },
         Some(PlayerId::P1) => GameSim {
+            is_replay: false,
             action_ticks: game.action_ticks,
             round_phase: RoundPhase::Begin,
             impulse: create_impulse_state(game.impulse_deck),
@@ -51,6 +53,7 @@ pub fn simulate_game(game: GameHistory) -> GameDelta {
             p2: create_player(PlayerId::P2, game.p2deck, false, Position::Top),
         },
         Some(PlayerId::P2) => GameSim {
+            is_replay: false,
             action_ticks: game.action_ticks,
             round_phase: RoundPhase::Begin,
             impulse: create_impulse_state(game.impulse_deck),
@@ -64,6 +67,7 @@ pub fn simulate_game(game: GameHistory) -> GameDelta {
     for (index, action) in game.actions.iter().enumerate() {
         if (index as i32) < game.action_index {
             previous = current.clone();
+            current.is_replay = (index as i32) < game.action_index - 1;
             current.advance();
             current.apply_action(action.clone());
             current.advance();

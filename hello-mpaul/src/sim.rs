@@ -12,6 +12,7 @@ pub enum RoundPhase {
 
 #[derive(Clone)]
 pub struct GameSim {
+    pub is_replay: bool,
     pub action_ticks: f32,
     pub round_phase: RoundPhase,
     pub impulse: ImpulseState,
@@ -105,7 +106,7 @@ impl GameSim {
                 }
             }
             RoundPhase::PreAttack => {
-                if self.action_ticks >= 0.0 {
+                if self.is_replay || self.action_ticks >= MAX_ACTION_TICKS * 3.0 {
                     self.round_phase = RoundPhase::PostAttack;
                     self.p1.animating_attack = false;
                     self.p2.animating_attack = false;
@@ -266,6 +267,4 @@ pub fn render_round(state: GameSim) {
         y = screen_height / 2.0,
         font = Font::L
     );
-
-    
 }
