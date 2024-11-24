@@ -20,8 +20,8 @@ mod ui;
 use ui::*;
 mod unit;
 use unit::*;
-mod util;
 mod server_comm;
+mod util;
 
 use main_menu::*;
 
@@ -52,7 +52,7 @@ turbo::init! {
         testing: bool,
   } = {
     Self {
-            history: create_game(&mut Vec::new()),
+            history: create_game(None, &mut Vec::new()),
             main_menue_state: MainMenuState::TitleScreen,
             match_info: MatchInfo::new(),
             game_mode: GameMode::MainMenu,
