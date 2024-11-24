@@ -245,23 +245,3 @@ pub fn render_round(state: GameSim) {
         font = Font::L
     )
 }
-
-pub fn render_planned_attack(attacker: PositionedUnit) {
-    // draw the planned attack
-    // Get the mouse state for player 1
-    let m = mouse(0);
-
-    // Get the mouse's x and y positions
-    let [mx, my] = m.position;
-
-    // Draw a circular cursor
-    circ!(d = 16, x = mx - 8, y = my - 8, color = 0xe64539ff);
-
-    // Draw line from attacker to cursor
-    path!(
-        start = (attacker.pos.x, attacker.pos.y),
-        end = (mx, my),
-        width = 2,
-        color = 0xff00ffff,
-    );
-}

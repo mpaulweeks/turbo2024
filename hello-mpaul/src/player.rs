@@ -144,47 +144,44 @@ fn tween_player(
         .collect();
 }
 
-pub fn render_player(
-    current: PlayerState,
-    previous: PlayerState,
-    percent: f32,
-    game: GameSim,
-) -> Vec<PositionedUnit> {
-    let positioned = tween_player(current.clone(), previous, percent, game.clone());
-    for pcard in positioned.iter() {
-        // todo forcing visible=true for local testing
-        render_unit(current.clone(), pcard.clone(), true);
-        if let Some(attacker) = current.targeting {
-            if pcard.unit.card.card_id == attacker {
-                render_planned_attack(pcard.clone());
-            }
+impl PlayerState {
+    pub fn render_player(
+        &self,
+        previous: PlayerState,
+        percent: f32,
+        game: GameSim,
+    ) -> Vec<PositionedUnit> {
+        let positioned = tween_player(self.clone(), previous, percent, game.clone());
+        for pcard in positioned.iter() {
+            // todo forcing visible=true for local testing
+            render_unit(self.clone(), pcard.clone(), true);
         }
+
+        // health
+        let res = resolution();
+        let screen_width = res[0] as f32;
+        let screen_height = res[1] as f32;
+        let grid_width = screen_width * 0.8;
+        let panel_width = screen_width - grid_width;
+        text!(
+            &self.health.to_string(),
+            x = panel_width / 2.0,
+            y = match self.player_id {
+                PlayerId::P1 => screen_height * 0.65,
+                PlayerId::P2 => screen_height * 0.35,
+            },
+            font = Font::L,
+        );
+
+        return positioned;
     }
 
-    // health
-    let res = resolution();
-    let screen_width = res[0] as f32;
-    let screen_height = res[1] as f32;
-    let grid_width = screen_width * 0.8;
-    let panel_width = screen_width - grid_width;
-    text!(
-        &current.health.to_string(),
-        x = panel_width / 2.0,
-        y = match current.player_id {
-            PlayerId::P1 => screen_height * 0.65,
-            PlayerId::P2 => screen_height * 0.35,
-        },
-        font = Font::L,
-    );
-
-    return positioned;
-}
-
-pub fn render_target(current: PlayerState, positioned: Vec<PositionedUnit>) {
-    if let Some(attacker) = current.targeting {
-        for pcard in positioned.iter() {
-            if pcard.unit.card.card_id == attacker {
-                render_planned_attack(pcard.clone());
+    pub fn render_target(&self, positioned: Vec<PositionedUnit>) {
+        if let Some(attacker) = self.targeting {
+            for pcard in positioned.iter() {
+                if pcard.unit.card.card_id == attacker {
+                    pcard.render_target();
+                }
             }
         }
     }
