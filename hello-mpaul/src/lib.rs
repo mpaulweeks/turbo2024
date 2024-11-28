@@ -42,6 +42,7 @@ turbo::init! {
   struct GameState {
         history: GameHistory,
         main_menue_state: MainMenuState,
+        start_matchmaking_tick: usize,
         match_info: MatchInfo,
         game_mode: enum GameMode{
             MainMenu,
@@ -52,6 +53,7 @@ turbo::init! {
     Self {
             history: create_game(None, &mut Vec::new()),
             main_menue_state: MainMenuState::TitleScreen,
+            start_matchmaking_tick: 0,
             match_info: MatchInfo::new(),
             game_mode: GameMode::MainMenu,
             testing: false,
@@ -77,9 +79,3 @@ turbo::go!({
 
     state.save();
 });
-
-#[export_name = "turbo/hello"]
-unsafe extern "C" fn on_hello() -> usize {
-    os::server::log!("Hello, world!");
-    return os::server::COMMIT;
-}

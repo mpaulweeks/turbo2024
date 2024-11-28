@@ -74,6 +74,10 @@ fn finding_opponent_go(state: &mut GameState) {
         os::client::exec(PROGRAM_ID, "try_find_match", &bytes);
     }
 
+    if (tick() - state.start_matchmaking_tick) < 60 {
+        return;
+    }
+
     let server_match_info = os::client::watch_file(PROGRAM_ID, &MATCHMAKING_FILE)
         .data
         .and_then(|file| MatchInfo::try_from_slice(&file.contents).ok());
@@ -89,35 +93,15 @@ fn finding_opponent_go(state: &mut GameState) {
                 //tell server to create rands
                 let bytes = state.match_info.match_id.to_le_bytes();
                 os::client::exec(PROGRAM_ID, "initialize_rands", &bytes);
-                os::client::exec(PROGRAM_ID, "clear_matchmaker", &bytes);
                 state.main_menue_state = MainMenuState::WaitingForRands;
                 log!("Initializing rands");
             } else if state.match_info.inviter_user == id.to_string() {
                 let bytes = state.match_info.match_id.to_le_bytes();
-                os::client::exec(PROGRAM_ID, "clear_matchmaker", &bytes);
                 state.main_menue_state = MainMenuState::WaitingForRands;
                 log!("Waiting for rands");
             }
         }
     }
-}
-
-#[export_name = "turbo/clear_matchmaker"]
-unsafe extern "C" fn on_clear_matchmaker() -> usize {
-    let mut match_info = os::server::read!(MatchInfo, &MATCHMAKING_FILE);
-    let user_id = os::server::get_user_id();
-
-    if match_info.inviter_user == user_id {
-        match_info.inviter_user = "".to_string();
-    } else if match_info.joining_user == user_id {
-        match_info.joining_user = "".to_string();
-    }
-
-    let Ok(_) = os::server::write!(&MATCHMAKING_FILE, match_info) else {
-        return os::server::CANCEL;
-    };
-
-    os::server::COMMIT
 }
 
 #[export_name = "turbo/try_find_match"]
@@ -136,32 +120,34 @@ unsafe extern "C" fn on_try_find_match() -> usize {
 
     let mut need_to_write_file = false;
 
-    // if someone else's match, start a new one
-    if match_info.match_started
-        && match_info.joining_user != user_id
-        && match_info.inviter_user != user_id
+    if os::server::secs_since_unix_epoch() - match_info.last_refresh_time > 2
     {
+        // stale match, so make a new one
         need_to_write_file = true;
+        new_match_info.last_refresh_time = os::server::secs_since_unix_epoch();
         match_info = new_match_info;
         os::server::log!("Creating Match: {}", match_info.match_id);
-    } else if match_info.inviter_user != user_id {
-        need_to_write_file = true;
-        if os::server::secs_since_unix_epoch() - match_info.last_refresh_time < 2 {
-            // found a match to join
+    }
+    else if !match_info.match_started
+    {
+        if match_info.inviter_user == user_id
+        {
+            // our match invitation, so just refresh the time if needed
+            if os::server::secs_since_unix_epoch() - match_info.last_refresh_time > 1
+            {
+                need_to_write_file = true;
+                match_info.last_refresh_time = os::server::secs_since_unix_epoch();
+                os::server::log!("refreshing time");
+            }
+        }
+        else {
+            // join match if it hasn't started
+            need_to_write_file = true;
             match_info.joining_user = user_id;
             match_info.match_started = true;
+            match_info.last_refresh_time = os::server::secs_since_unix_epoch();
             os::server::log!("Joining Match: {}", match_info.match_id);
-        } else {
-            match_info = new_match_info;
-            os::server::log!(
-                "clearing old match and creating Match: {}",
-                match_info.match_id
-            );
         }
-    } else if os::server::secs_since_unix_epoch() - match_info.last_refresh_time > 1 {
-        need_to_write_file = true;
-        match_info.last_refresh_time = os::server::secs_since_unix_epoch();
-        os::server::log!("refreshing time");
     }
 
     if need_to_write_file {
@@ -194,6 +180,7 @@ fn title_screen_go(state: &mut GameState) {
     if button_contains_pos(m.position[0], m.position[1], w, h, x, y) {
         color = 0x000000FF;
         if m.left.just_pressed() {
+            state.start_matchmaking_tick = tick();
             state.main_menue_state = MainMenuState::WaitingForMatch;
         }
     }
